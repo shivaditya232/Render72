@@ -2,20 +2,47 @@
 
 import {getIstDateKey} from './formatters';
 
+// Sessions closer than this (and in the same venue) are really one session.
+const JOIN_GAP_MS=2*60*1000;
+
+// The API splits overnight runs at midnight (18:00–23:59, then 00:00–18:00 next day).
+// Back-to-back sessions in the same venue are joined, so a 24-hour hackathon is one block.
+// Returns [{start, end, venue, isOvernight}] from the full schedule (empty for summaries).
+export const getSessions=(event)=>{
+    const result=[];
+    if(!event||!Array.isArray(event.schedules)){
+        return result;
+    }
+    for(let i=0;i<event.schedules.length;i++){
+        const slot=event.schedules[i];
+        if(slot.start===null){
+            continue;
+        }
+        const previous=result.length>0?result[result.length-1]:null;
+        if(previous&&previous.end!==null&&slot.venue===previous.venue){
+            const gap=slot.start-previous.end;
+            if(gap>=0&&gap<=JOIN_GAP_MS){
+                previous.end=slot.end;
+                previous.isOvernight=true;
+                continue;
+            }
+        }
+        result.push({start:slot.start,end:slot.end,venue:slot.venue,isOvernight:false});
+    }
+    return result;
+};
+
 // The real sessions if we have them (detail page loaded), otherwise the overall span.
 // Using sessions matters: a 3-day film sprint runs 10–5 each day, not non-stop.
 export const getSlots=(event)=>{
     const slots=[];
-    if(event.schedules&&event.schedules.length>0){
-        for(let i=0;i<event.schedules.length;i++){
-            const slot=event.schedules[i];
-            if(slot.start!==null){
-                slots.push({start:slot.start,end:slot.end!==null?slot.end:slot.start+60*60*1000});
-            }
+    const sessions=getSessions(event);
+    if(sessions.length>0){
+        for(let i=0;i<sessions.length;i++){
+            const session=sessions[i];
+            slots.push({start:session.start,end:session.end!==null?session.end:session.start+60*60*1000});
         }
-        if(slots.length>0){
-            return slots;
-        }
+        return slots;
     }
     if(event.start!==null){
         const end=event.end!==null?event.end:event.start+60*60*1000;

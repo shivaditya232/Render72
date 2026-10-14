@@ -140,15 +140,32 @@ const cleanPrizes=(value)=>{
         if(title===''&&amount===null){
             continue;
         }
+        // A prize with no rank (e.g. "Best sound design") is a special award, not a podium place.
+        let rank=cleanNumber(prize.rank);
+        if(rank!==null&&(rank<1||!Number.isInteger(rank))){
+            rank=null;
+        }
         result.push({
-            rank:cleanNumber(prize.rank)||i+1,
+            rank,
+            isSpecial:rank===null,
+            order:i,
             title:title||'Prize',
             amount:amount!==null&&amount>=0?amount:null,
             description:cleanText(prize.description)
         });
     }
+    // Ranked places first (1, 2, 3 …), then special awards in the organisers' order.
     result.sort((a,b)=>{
-        return a.rank-b.rank;
+        if(a.rank!==null&&b.rank!==null){
+            return a.rank-b.rank;
+        }
+        if(a.rank!==null){
+            return -1;
+        }
+        if(b.rank!==null){
+            return 1;
+        }
+        return a.order-b.order;
     });
     return result;
 };

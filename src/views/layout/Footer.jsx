@@ -8,7 +8,7 @@ const Footer=()=>{
                 <div className="space-y-3">
                     <Wordmark/>
                     <p className="max-w-sm text-sm leading-relaxed text-ash">
-                        Thirty events, one programme. All times are in Indian Standard Time.
+                        Every event, one programme. All times are in Indian Standard Time.
                     </p>
                 </div>
                 <div className="flex flex-col gap-2 md:items-end">
