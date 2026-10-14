@@ -11,15 +11,12 @@ const Footer=()=>{
                         Every event, one programme. All times are in Indian Standard Time.
                     </p>
                 </div>
-                <div className="flex flex-col gap-2 md:items-end">
-                    <nav aria-label="Footer">
-                        <ul className="flex gap-6 text-sm">
-                            <li><Link to="/" className="text-ash transition-colors hover:text-bone">Programme</Link></li>
-                            <li><Link to="/events" className="text-ash transition-colors hover:text-bone">All events</Link></li>
-                        </ul>
-                    </nav>
-                    <p className="label-mono text-ash">Built for Render72 · CORE Lab</p>
-                </div>
+                <nav aria-label="Footer">
+                    <ul className="flex gap-6 text-sm">
+                        <li><Link to="/" className="text-ash transition-colors hover:text-bone">Programme</Link></li>
+                        <li><Link to="/events" className="text-ash transition-colors hover:text-bone">All events</Link></li>
+                    </ul>
+                </nav>
             </div>
         </footer>
     );

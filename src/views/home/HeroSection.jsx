@@ -27,9 +27,9 @@ const HeroSection=({festWindow,status,trackSummaries,hasClosingSoon,notice})=>{
                     <div>
                         <p className="label-mono text-ash">{dateLabel}</p>
                         <h1 id="hero-title" className="condensed mt-5 text-[clamp(3.5rem,9.5vw,8.75rem)] font-extrabold leading-[0.84] tracking-[-0.02em]">
-                            <span className="block">{dayLine}</span>
-                            <span className="block">{eventLine}</span>
-                            <span className="block">Find yours.</span>
+                            {/* One block of text with line breaks (not three blocks), so the browser
+                                treats the headline as the page's main content when measuring load speed. */}
+                            {dayLine}<br/>{eventLine}<br/>Find yours.
                         </h1>
                         {/* Six segments, one per track colour: the site's mark in miniature. */}
                         <div aria-hidden="true" className="mt-6 flex h-1.5 w-full max-w-[18rem] overflow-hidden rounded-full">
@@ -43,6 +43,8 @@ const HeroSection=({festWindow,status,trackSummaries,hasClosingSoon,notice})=>{
                         {hasData?(
                             <Countdown targetMs={festWindow.start} endMs={festWindow.end} label="The programme opens"/>
                         ):null}
+                        {/* Same size as the countdown, so the buttons don't jump when it arrives. */}
+                        {status==='loading'?<div aria-hidden="true" className="skeleton h-[81px] w-[260px] rounded-xl sm:h-[93px] sm:w-[379px] lg:h-[95px]"/>:null}
                         <div className="flex flex-wrap gap-3">
                             <Link to="/events" className="inline-flex items-center gap-2 rounded-full bg-signal px-6 py-3.5 text-sm font-semibold text-bone transition-colors hover:bg-[#2747E6]">
                                 Browse the programme

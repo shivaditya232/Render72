@@ -219,7 +219,7 @@ const EventDetailPage=()=>{
     else if(status==='not_found'){
         title='Not on the programme';
     }
-    useDocumentTitle(title);
+    useDocumentTitle(title,event&&event.blurb?event.blurb:null);
 
     if(status==='not_found'){
         return <NotOnProgramme/>;

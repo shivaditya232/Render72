@@ -29,7 +29,7 @@ import {splitIntoDays} from '../../utils/schedule';
 import {getPosterNumbers} from '../../utils/landing';
 
 const EventsPage=()=>{
-    useDocumentTitle('All events');
+    useDocumentTitle('All events','Every event on the programme. Search, filter by track, day, fee and team size, and save the ones you want to a plan that flags clashes.');
     const {status,events,source,savedAt,error,retry,isRefreshing}=useEvents();
     const filters=useEventFilters(events);
     const plan=usePlan();
@@ -106,6 +106,8 @@ const EventsPage=()=>{
                     {status==='ready'?(
                         <WhenTabs value={filters.state.when} counts={filters.whenCounts} onChange={filters.setWhen}/>
                     ):null}
+                    {/* While loading, hold the space the real controls will take, so nothing jumps. */}
+                    {status==='loading'?<div aria-hidden="true" className="skeleton h-[42px] w-full rounded-full md:w-[210px]"/>:null}
                 </div>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -134,6 +136,7 @@ const EventsPage=()=>{
                         </button>
                     </div>
                 ):null}
+                {status==='loading'?<div aria-hidden="true" className="skeleton mt-5 h-[92px] rounded-2xl md:h-[88px] lg:h-[42px]"/>:null}
 
                 <div className="mt-6">
                     <div className="min-w-0 space-y-6">
@@ -155,7 +158,9 @@ const EventsPage=()=>{
 
                         {status==='loading'?(
                             <div aria-busy="true" className="space-y-4">
-                                <LoadingPhrase active={true}/>
+                                <div className="flex h-[66px] items-start md:h-[34px] md:items-center">
+                                    <LoadingPhrase active={true}/>
+                                </div>
                                 <ResultsSkeleton view={view}/>
                             </div>
                         ):null}

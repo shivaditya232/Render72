@@ -3,7 +3,7 @@
 const Wordmark=({size})=>{
     const isLarge=size==='large';
     return (
-        <span className="inline-flex items-center gap-1.5 select-none" aria-label="Render72">
+        <span role="img" className="inline-flex items-center gap-1.5 select-none" aria-label="Render72">
             <span
                 aria-hidden="true"
                 className={isLarge?'condensed font-extrabold tracking-tight text-[clamp(3.5rem,14vw,11rem)] leading-[0.82]':'condensed font-extrabold tracking-tight text-[1.375rem] leading-none'}

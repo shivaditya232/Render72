@@ -1,13 +1,19 @@
-import {useCallback,useEffect,useState} from 'react';
+import {Suspense,lazy,useCallback,useEffect,useState} from 'react';
 import {Outlet,ScrollRestoration,useNavigation} from 'react-router';
 import Header from './Header';
 import Footer from './Footer';
 import NetworkBanner from './NetworkBanner';
 import NavigationOverlay from './NavigationOverlay';
-import PlanDrawer from '../plan/PlanDrawer';
 import useNetworkStatus from '../../controllers/useNetworkStatus';
-import {preloadPages} from '../../routes/lazyPage';
-import {PAGE_IMPORTERS} from '../../routes/pageImporters';
+import {preloadPages,importWithRetry} from '../../routes/lazyPage';
+import {PAGE_IMPORTERS,importPlanDrawer} from '../../routes/pageImporters';
+
+// The plan drawer's code is only needed once someone opens it.
+// It's fetched quietly in the background after the page settles (see preloadPages),
+// so the first open is still instant, but it no longer delays the first page.
+const PlanDrawer=lazy(()=>{
+    return importWithRetry(importPlanDrawer);
+});
 
 const AppLayout=()=>{
     const navigation=useNavigation();
@@ -15,8 +21,10 @@ const AppLayout=()=>{
     const isPending=navigation.state==='loading';
     const isWaitingOffline=isPending&&!isOnline;
     const [planOpen,setPlanOpen]=useState(false);
+    const [planWanted,setPlanWanted]=useState(false);
 
     const openPlan=useCallback(()=>{
+        setPlanWanted(true);
         setPlanOpen(true);
     },[]);
 
@@ -48,7 +56,11 @@ const AppLayout=()=>{
             </main>
             <Footer/>
             <NavigationOverlay isPending={isPending} isOnline={isOnline}/>
-            <PlanDrawer open={planOpen} onClose={closePlan}/>
+            {planWanted?(
+                <Suspense fallback={null}>
+                    <PlanDrawer open={planOpen} onClose={closePlan}/>
+                </Suspense>
+            ):null}
             <ScrollRestoration/>
         </div>
     );

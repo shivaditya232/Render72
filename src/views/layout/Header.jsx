@@ -35,16 +35,18 @@ const Header=({onOpenPlan})=>{
                             type="button"
                             onClick={onOpenPlan}
                             className="inline-flex items-center gap-2 rounded-full border border-line py-1.5 pl-3 pr-1.5 text-sm font-medium text-bone transition-colors hover:border-ash"
-                            aria-label={'Your plan, '+plan.count+(plan.count===1?' event saved':' events saved')}
                         >
+                            {/* Named by its own text ("Your plan 2 events saved"), so what you see is what a screen reader says. */}
                             <Icon name="bookmark" size={15} className={plan.count>0?'fill-current':''}/>
-                            <span className="hidden sm:inline">Your plan</span>
+                            <span className="sr-only sm:not-sr-only">Your plan</span>
+                            {' '}
                             <span
                                 key={plan.count}
                                 className={plan.count>0?'tabular flex h-6 min-w-6 animate-[bump_0.35s_ease-out] items-center justify-center rounded-full bg-signal px-1.5 text-xs font-semibold text-bone':'tabular flex h-6 min-w-6 items-center justify-center rounded-full bg-line px-1.5 text-xs font-semibold text-ash'}
                             >
                                 {plan.count}
                             </span>
+                            <span className="sr-only">{plan.count===1?' event saved':' events saved'}</span>
                         </button>
                     ):null}
                 </nav>

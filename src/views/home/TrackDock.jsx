@@ -2,6 +2,7 @@ import {useCallback,useEffect,useRef} from 'react';
 import {Link} from 'react-router';
 import Icon from '../components/Icon';
 import {getSizedImageUrl} from '../../utils/images';
+import useMediaQuery from '../../controllers/useMediaQuery';
 
 // The six tracks as colour bands, like the macOS dock: bands near the cursor
 // swell, the one under it opens up and shows what's inside. Click to browse that track.
@@ -25,13 +26,17 @@ const prefersReducedMotion=()=>{
     }
 };
 
-// One clean name for screen readers, instead of "01 5 events Browse Code & AI".
-const getLinkLabel=(summary)=>{
-    const noun=summary.count===1?'event':'events';
-    return summary.track.label+', '+summary.count+' upcoming '+noun;
+const getCountText=(summary)=>{
+    return summary.count+(summary.count===1?' event':' events');
 };
 
+// How many tiles are in the first screen on a phone: those load first.
+const FIRST_TILES=2;
+
 const TrackDock=({summaries})=>{
+    // Only the layout on screen is rendered, so phones don't download the dock's
+    // large photos and desktops don't download the tiles.
+    const isWide=useMediaQuery('(min-width: 1024px)');
     const bandRefs=useRef([]);
     const current=useRef([]);
     const target=useRef([]);
@@ -117,91 +122,94 @@ const TrackDock=({summaries})=>{
     return (
         <nav aria-label="Browse by track">
             {/* Wide screens: the dock */}
-            <ul
-                className="track-dock hidden h-[clamp(20rem,44vh,28rem)] gap-2 lg:flex"
-                onPointerMove={onPointerMove}
-                onPointerLeave={relax}
-                onBlur={(event)=>{
-                    if(!event.currentTarget.contains(event.relatedTarget)){
-                        relax();
-                    }
-                }}
-            >
-                {summaries.map((summary,index)=>{
-                    const track=summary.track;
-                    const image=summary.cover?getSizedImageUrl(summary.cover.cover.url,640,800):null;
-                    return (
-                        <li
-                            key={track.id}
-                            ref={(node)=>{
-                                bandRefs.current[index]=node;
-                            }}
-                            className="dock-band @container relative isolate min-w-[5.75rem] flex-1 overflow-hidden rounded-2xl"
-                            style={{'--tint':track.color}}
-                        >
-                            <Link
-                                to={'/events?track='+track.id}
-                                aria-label={getLinkLabel(summary)}
-                                onFocus={()=>{
-                                    onFocusBand(index);
+            {isWide?(
+                <ul
+                    className="track-dock hidden h-[clamp(20rem,44vh,28rem)] gap-2 lg:flex"
+                    onPointerMove={onPointerMove}
+                    onPointerLeave={relax}
+                    onBlur={(event)=>{
+                        if(!event.currentTarget.contains(event.relatedTarget)){
+                            relax();
+                        }
+                    }}
+                >
+                    {summaries.map((summary,index)=>{
+                        const track=summary.track;
+                        const image=summary.cover?getSizedImageUrl(summary.cover.cover.url,640,800):null;
+                        return (
+                            <li
+                                key={track.id}
+                                ref={(node)=>{
+                                    bandRefs.current[index]=node;
                                 }}
-                                className="group absolute inset-0 flex flex-col justify-between p-4 outline-none xl:p-5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-bone"
+                                className="dock-band @container relative isolate min-w-[5.75rem] flex-1 overflow-hidden rounded-2xl"
+                                style={{'--tint':track.color}}
                             >
-                                <span className="absolute inset-0 -z-10" aria-hidden="true">
-                                    <span className="duotone block h-full w-full">
-                                        {image?<img className="duo-base" src={image} alt="" loading="eager" fetchPriority="low" decoding="async" width="640" height="800"/>:null}
-                                        <span className="duo-tint"/>
-                                        <span className="duo-lift"/>
-                                        <span className="dock-shade"/>
+                                <Link
+                                    to={'/events?track='+track.id}
+                                    onFocus={()=>{
+                                        onFocusBand(index);
+                                    }}
+                                    className="group absolute inset-0 flex flex-col justify-between p-4 outline-none xl:p-5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-bone"
+                                >
+                                    <span className="absolute inset-0 -z-10" aria-hidden="true">
+                                        <span className="duotone block h-full w-full">
+                                            {image?<img className="duo-base" src={image} alt="" loading="eager" fetchPriority="low" decoding="async" width="640" height="800"/>:null}
+                                            <span className="duo-tint"/>
+                                            <span className="duo-lift"/>
+                                            <span className="dock-shade"/>
+                                        </span>
                                     </span>
-                                </span>
-                                <span className="flex items-start justify-between gap-3">
-                                    <span className="label-mono text-bone/80">{String(index+1).padStart(2,'0')}</span>
-                                    <span className="dock-detail label-mono rounded-full bg-ink/70 px-2.5 py-1 text-bone backdrop-blur-sm">
-                                        {summary.count} {summary.count===1?'event':'events'}
+                                    <span className="flex items-start justify-between gap-3">
+                                        <span aria-hidden="true" className="label-mono text-bone/80">{String(index+1).padStart(2,'0')}</span>
+                                        <span aria-hidden="true" className="dock-detail label-mono rounded-full bg-ink/70 px-2.5 py-1 text-bone backdrop-blur-sm">
+                                            {getCountText(summary)}
+                                        </span>
                                     </span>
-                                </span>
-                                {/* "Browse" sits above the label, so every label keeps the same baseline. */}
-                                <span className="flex flex-col items-start gap-2.5">
-                                    <span className="dock-detail inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold" style={{color:track.color}}>
-                                        Browse
-                                        <Icon name="arrowRight" size={15}/>
+                                    {/* "Browse" sits above the label, so every label keeps the same baseline. */}
+                                    <span className="flex flex-col items-start gap-2.5">
+                                        <span aria-hidden="true" className="dock-detail inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold" style={{color:track.color}}>
+                                            Browse
+                                            <Icon name="arrowRight" size={15}/>
+                                        </span>
+                                        {/* Sized from the band's own width (container units), so a squeezed band
+                                            shrinks its label instead of cutting "Engineering" in half. */}
+                                        <span className="condensed block text-[length:clamp(0.8rem,calc((100cqi_-_2.5rem)/4.7),2.25rem)] font-extrabold leading-[0.95] tracking-tight text-bone">
+                                            {track.label}
+                                        </span>
+                                        {/* Screen readers hear "Code & AI, 5 events" in one go. */}
+                                        <span className="sr-only">, {getCountText(summary)}</span>
                                     </span>
-                                    {/* Sized from the band's own width (container units), so a squeezed band
-                                        shrinks its label instead of cutting "Engineering" in half. */}
-                                    <span className="condensed block text-[length:clamp(0.8rem,calc((100cqi_-_2.5rem)/4.7),2.25rem)] font-extrabold leading-[0.95] tracking-tight text-bone">
-                                        {track.label}
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
+            ):(
+                /* Phones and tablets (touch, no hover to swell): a grid of tiles */
+                <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:hidden">
+                    {summaries.map((summary,index)=>{
+                        const track=summary.track;
+                        const image=summary.cover?getSizedImageUrl(summary.cover.cover.url,360,300):null;
+                        return (
+                            <li key={track.id} className="relative isolate aspect-[6/5] overflow-hidden rounded-2xl" style={{'--tint':track.color}}>
+                                <Link to={'/events?track='+track.id} className="absolute inset-0 flex flex-col justify-end p-3.5">
+                                    <span className="absolute inset-0 -z-10" aria-hidden="true">
+                                        <span className="duotone block h-full w-full">
+                                            {image?<img className="duo-base" src={image} alt="" loading="eager" fetchPriority={index<FIRST_TILES?'high':'low'} decoding="async" width="360" height="300"/>:null}
+                                            <span className="duo-tint"/>
+                                            <span className="duo-lift"/>
+                                            <span className="dock-shade"/>
+                                        </span>
                                     </span>
-                                </span>
-                            </Link>
-                        </li>
-                    );
-                })}
-            </ul>
-
-            {/* Phones and tablets (touch, no hover to swell): a grid of tiles */}
-            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:hidden">
-                {summaries.map((summary)=>{
-                    const track=summary.track;
-                    const image=summary.cover?getSizedImageUrl(summary.cover.cover.url,360,300):null;
-                    return (
-                        <li key={track.id} className="relative isolate aspect-[6/5] overflow-hidden rounded-2xl" style={{'--tint':track.color}}>
-                            <Link to={'/events?track='+track.id} aria-label={getLinkLabel(summary)} className="absolute inset-0 flex flex-col justify-end p-3.5">
-                                <span className="absolute inset-0 -z-10" aria-hidden="true">
-                                    <span className="duotone block h-full w-full">
-                                        {image?<img className="duo-base" src={image} alt="" loading="lazy" decoding="async" width="360" height="300"/>:null}
-                                        <span className="duo-tint"/>
-                                        <span className="duo-lift"/>
-                                        <span className="dock-shade"/>
-                                    </span>
-                                </span>
-                                <span className="condensed text-xl font-extrabold leading-[0.95] tracking-tight text-bone">{track.label}</span>
-                                <span className="label-mono mt-1 text-bone/80">{summary.count} {summary.count===1?'event':'events'}</span>
-                            </Link>
-                        </li>
-                    );
-                })}
-            </ul>
+                                    <span className="condensed text-xl font-extrabold leading-[0.95] tracking-tight text-bone">{track.label}</span>
+                                    <span className="label-mono mt-1 text-bone/80"><span className="sr-only">, </span>{getCountText(summary)}</span>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
         </nav>
     );
 };
