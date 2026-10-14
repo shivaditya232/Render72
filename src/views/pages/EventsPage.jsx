@@ -8,6 +8,8 @@ import Icon from '../components/Icon';
 import PosterCard from '../events/PosterCard';
 import IndexRow from '../events/IndexRow';
 import DateStrip from '../events/DateStrip';
+import TrackBar from '../events/TrackBar';
+import DayHeading from '../events/DayHeading';
 import WhenTabs from '../events/WhenTabs';
 import FilterPanel from '../events/FilterPanel';
 import SearchField from '../events/SearchField';
@@ -23,6 +25,7 @@ import useViewMode from '../../controllers/useViewMode';
 import useFlipAnimation from '../../controllers/useFlipAnimation';
 import useDocumentTitle from '../../controllers/useDocumentTitle';
 import {getQueryTokens} from '../../utils/filterEvents';
+import {splitIntoDays} from '../../utils/schedule';
 import {compareByStart} from '../../models/eventModel';
 
 const EventsPage=()=>{
@@ -32,6 +35,7 @@ const EventsPage=()=>{
     const plan=usePlan();
     const [view,setView]=useViewMode();
     const [filtersOpen,setFiltersOpen]=useState(false);
+    const [filtersVariant,setFiltersVariant]=useState('sheet');
 
     // Poster numbers follow the full programme order, so "No. 07" never changes while filtering.
     const posterNumbers=useMemo(()=>{
@@ -59,9 +63,32 @@ const EventsPage=()=>{
     }
     const registerFlip=useFlipAnimation(signature,view);
 
+    const openFilters=useCallback(()=>{
+        let isWide=false;
+        try{
+            isWide=window.matchMedia('(min-width: 1024px)').matches;
+        }
+        catch(error){
+            isWide=false;
+        }
+        setFiltersVariant(isWide?'drawer':'sheet');
+        setFiltersOpen(true);
+    },[]);
+
     const closeFilters=useCallback(()=>{
         setFiltersOpen(false);
     },[]);
+
+    // Tracks live in the bar on the page; everything else is in the "More filters" panel.
+    const moreFilterCount=filters.activeFacetCount-filters.state.facets.track.length;
+
+    // Day headings only make sense when the list is in date order.
+    const sections=useMemo(()=>{
+        if(filters.state.sort==='soonest'){
+            return splitIntoDays(results);
+        }
+        return [{key:'all',start:null,events:results,hideHeading:true}];
+    },[results,filters.state.sort]);
 
     const hasFilters=filters.activeFilters.length>0;
     const tabTotal=filters.whenCounts[filters.state.when];
@@ -73,7 +100,7 @@ const EventsPage=()=>{
 
     return (
         <section className="page-gutter">
-            <div className="mx-auto max-w-[1440px] pb-8 pt-10 md:pt-14">
+            <div className="mx-auto max-w-[1440px] pb-8 pt-8 md:pt-12">
                 <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                     <div>
                         <p className="label-mono text-ash">The programme</p>
@@ -89,18 +116,6 @@ const EventsPage=()=>{
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                     <SearchField value={filters.queryInput} onChange={filters.setQuery}/>
                     <div className="flex min-w-0 items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={()=>{
-                                setFiltersOpen(true);
-                            }}
-                            className="inline-flex h-12 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-bone transition-colors hover:border-ash lg:hidden"
-                        >
-                            Filters
-                            {filters.activeFacetCount>0?(
-                                <span className="tabular flex h-5 min-w-5 items-center justify-center rounded-full bg-signal px-1.5 text-xs font-semibold text-bone">{filters.activeFacetCount}</span>
-                            ):null}
-                        </button>
                         <div className="min-w-0 flex-1 sm:w-56 sm:flex-none">
                             <SortSelect value={filters.state.sort} onChange={filters.setSort}/>
                         </div>
@@ -109,31 +124,35 @@ const EventsPage=()=>{
                 </div>
 
                 {status==='ready'?(
-                    <div className="mt-5">
-                        <DateStrip
-                            buckets={filters.dateBuckets}
-                            selected={filters.state.date}
-                            onSelect={filters.setDate}
-                            totalCount={tabTotal}
-                        />
+                    <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <TrackBar selected={filters.state.facets.track} counts={filters.facetCounts.track} onToggle={filters.toggleOption}/>
+                        <button
+                            type="button"
+                            onClick={openFilters}
+                            className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-line px-4 py-2 text-sm font-medium text-bone transition-colors hover:border-ash"
+                        >
+                            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                            More filters
+                            {moreFilterCount>0?(
+                                <span className="tabular flex h-5 min-w-5 items-center justify-center rounded-full bg-signal px-1.5 text-xs font-semibold text-bone">{moreFilterCount}</span>
+                            ):null}
+                        </button>
                     </div>
                 ):null}
 
-                <div className="mt-8 lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)] lg:gap-12">
-                    <aside aria-label="Filters" className="hidden lg:block">
-                        <div className="sticky top-24">
-                            {status==='ready'?(
-                                <FilterPanel facets={filters.state.facets} counts={filters.facetCounts} onToggle={filters.toggleOption} idPrefix="side" layout="list"/>
-                            ):null}
-                        </div>
-                    </aside>
-
+                <div className="mt-6">
                     <div className="min-w-0 space-y-6">
                         {status==='ready'?(
                             <div className="space-y-4">
                                 <DataSourceNotice source={source} savedAt={savedAt} error={error} onRetry={retry} isRefreshing={isRefreshing}/>
-                                <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <p className="tabular text-sm text-ash" role="status" aria-live="polite">{summary}</p>
+                                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                    <p className="tabular shrink-0 text-sm text-ash" role="status" aria-live="polite">{summary}</p>
+                                    <DateStrip
+                                        buckets={filters.dateBuckets}
+                                        selected={filters.state.date}
+                                        onSelect={filters.setDate}
+                                        totalCount={tabTotal}
+                                    />
                                 </div>
                                 <ActiveFilters filters={filters.activeFilters} onRemove={filters.removeFilter} onClearAll={filters.clearAll}/>
                             </div>
@@ -191,25 +210,41 @@ const EventsPage=()=>{
                                         })}
                                     </ul>
                                 ):(
-                                    <ul className="grid grid-cols-1 gap-x-5 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
-                                        {results.map((event,index)=>{
+                                    <div className="space-y-14">
+                                        {sections.map((section,sectionIndex)=>{
+                                            const headingId='day-'+section.key;
                                             return (
-                                                <li key={event.id} ref={registerFlip(event.id)}>
-                                                    <PosterCard
-                                                        event={event}
-                                                        number={posterNumbers[event.id]}
-                                                        tokens={tokens}
-                                                        saved={plan.isSaved(event.id)}
-                                                        onToggleSave={()=>{
-                                                            plan.toggle(event.id);
-                                                        }}
-                                                        priority={index===0}
-                                                        now={now}
-                                                    />
-                                                </li>
+                                                <section key={section.key} aria-labelledby={section.hideHeading?undefined:headingId} className="space-y-8">
+                                                    {section.hideHeading?null:(
+                                                        <DayHeading start={section.start} count={section.events.length} headingId={headingId}/>
+                                                    )}
+                                                    <ul className="grid grid-flow-dense grid-cols-1 gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                                                        {section.events.map((event,index)=>{
+                                                            // Featured events, and a day's only event, get a wide two-column poster.
+                                                            const isWide=event.isFeatured||section.events.length===1;
+                                                            return (
+                                                                <li key={event.id} ref={registerFlip(event.id)} className={isWide?'sm:col-span-2':undefined}>
+                                                                    <PosterCard
+                                                                        event={event}
+                                                                        number={posterNumbers[event.id]}
+                                                                        tokens={tokens}
+                                                                        saved={plan.isSaved(event.id)}
+                                                                        onToggleSave={()=>{
+                                                                            plan.toggle(event.id);
+                                                                        }}
+                                                                        priority={sectionIndex===0&&index===0}
+                                                                        now={now}
+                                                                        isFeatured={event.isFeatured}
+                                                                        isWide={isWide}
+                                                                    />
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                </section>
                                             );
                                         })}
-                                    </ul>
+                                    </div>
                                 )}
                             </SectionBoundary>
                         ):null}
@@ -217,10 +252,10 @@ const EventsPage=()=>{
                 </div>
             </div>
 
-            <Dialog open={filtersOpen} onClose={closeFilters} labelledBy="filter-sheet-title" variant="sheet">
-                <div className="flex max-h-[88dvh] flex-col rounded-t-3xl border-t border-line bg-graphite">
-                    <div className="flex items-center justify-between px-5 pb-3 pt-5">
-                        <h2 id="filter-sheet-title" className="text-lg font-semibold">Filters</h2>
+            <Dialog open={filtersOpen} onClose={closeFilters} labelledBy="filter-sheet-title" variant={filtersVariant}>
+                <div className={filtersVariant==='drawer'?'flex h-full flex-col border-l border-line bg-graphite':'flex max-h-[88dvh] flex-col rounded-t-3xl border-t border-line bg-graphite'}>
+                    <div className="flex items-center justify-between px-6 pb-3 pt-6">
+                        <h2 id="filter-sheet-title" className="condensed text-3xl font-extrabold tracking-tight">More filters</h2>
                         <button
                             type="button"
                             onClick={closeFilters}
@@ -230,17 +265,17 @@ const EventsPage=()=>{
                             <Icon name="close" size={20}/>
                         </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto px-5 pb-6">
-                        <FilterPanel facets={filters.state.facets} counts={filters.facetCounts} onToggle={filters.toggleOption} idPrefix="sheet"/>
+                    <div className="flex-1 overflow-y-auto px-6 pb-6">
+                        <FilterPanel facets={filters.state.facets} counts={filters.facetCounts} onToggle={filters.toggleOption} idPrefix="sheet" excludeKeys={['track']}/>
                     </div>
-                    <div className="flex gap-3 border-t border-line px-5 py-4">
+                    <div className="flex gap-3 border-t border-line px-6 py-4">
                         {filters.activeFacetCount>0?(
                             <button
                                 type="button"
                                 onClick={filters.clearAll}
                                 className="rounded-full border border-line px-5 py-3 text-sm font-medium text-bone"
                             >
-                                Clear
+                                Clear all
                             </button>
                         ):null}
                         <button

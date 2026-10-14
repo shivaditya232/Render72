@@ -212,3 +212,14 @@ export const isMultiDay=(startMs,endMs)=>{
     }
     return getIstDateKey(startMs)!==getIstDateKey(endMs);
 };
+
+const longWeekdayFormatter=makeFormatter({weekday:'long'});
+const longMonthFormatter=makeFormatter({month:'long'});
+
+// { weekday:'Friday', month:'November' } in IST
+export const getLongDateParts=(ms)=>{
+    if(!isValidTime(ms)){
+        return null;
+    }
+    return {weekday:longWeekdayFormatter.format(ms),month:longMonthFormatter.format(ms)};
+};

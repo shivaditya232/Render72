@@ -309,7 +309,7 @@ export const normalizeEvent=(raw,nowMs)=>{
         blurb,
         description:cleanText(raw.description),
         category,
-        track:{id:track.id,label:track.label},
+        track:{id:track.id,label:track.label,color:track.color},
         tags,
         type:cleanEnum(raw.event_type,EVENT_TYPES,'EVENT'),
         mode:cleanEnum(raw.event_mode,EVENT_MODES,'OFFLINE'),

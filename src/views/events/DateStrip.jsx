@@ -1,17 +1,18 @@
 import {getDateParts} from '../../utils/formatters';
 
-// One chip per day that has events, with how many match right now.
+// Compact day pills: "All days 28 · Fri 13 8 · Sat 14 10 …".
+// Each shows how many events match right now; a day with none is dimmed.
 // Scrolls sideways on small screens instead of wrapping into a wall of chips.
 const DateStrip=({buckets,selected,onSelect,totalCount})=>{
     if(buckets.length<=1){
         return null;
     }
-    const baseClass='flex shrink-0 flex-col items-start rounded-xl border px-3.5 py-2.5 text-left transition-colors';
+    const baseClass='inline-flex shrink-0 items-baseline gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors';
     const onClass=' border-bone bg-bone text-ink';
     const offClass=' border-line text-bone hover:border-ash';
 
     return (
-        <div role="group" aria-label="Filter by day" className="scroll-row -mx-4 flex gap-2 px-4 pb-1 sm:mx-0 sm:px-0">
+        <div role="group" aria-label="Filter by day" className="scroll-row -mx-4 flex gap-2 px-4 sm:mx-0 sm:px-0">
             <button
                 type="button"
                 aria-pressed={selected===''}
@@ -20,29 +21,29 @@ const DateStrip=({buckets,selected,onSelect,totalCount})=>{
                 }}
                 className={baseClass+(selected===''?onClass:offClass)}
             >
-                <span className="label-mono opacity-70">Every day</span>
-                <span className="tabular text-sm font-semibold">{totalCount} events</span>
+                <span className="font-medium">All days</span>
+                <span className={selected===''?'tabular text-xs text-ink/60':'tabular text-xs text-ash'}>{totalCount}</span>
             </button>
             {buckets.map((bucket)=>{
                 const parts=getDateParts(bucket.start);
                 const isOn=selected===bucket.key;
                 const isEmpty=bucket.count===0&&!isOn;
+                const label=parts?parts.weekday+' '+parts.day+' '+parts.month:bucket.key;
                 return (
                     <button
                         key={bucket.key}
                         type="button"
                         aria-pressed={isOn}
+                        aria-label={label+', '+bucket.count+(bucket.count===1?' event':' events')}
                         disabled={isEmpty}
                         onClick={()=>{
                             onSelect(bucket.key);
                         }}
                         className={baseClass+(isOn?onClass:offClass)+(isEmpty?' cursor-not-allowed opacity-35 hover:border-line':'')}
                     >
-                        <span className="label-mono opacity-70">{parts?parts.weekday+' · '+parts.month:''}</span>
-                        <span className="flex items-baseline gap-2">
-                            <span className="condensed tabular text-xl font-bold leading-none">{parts?parts.day:''}</span>
-                            <span className="tabular text-xs opacity-70">{bucket.count} {bucket.count===1?'event':'events'}</span>
-                        </span>
+                        <span className={isOn?'text-ink/70':'text-ash'}>{parts?parts.weekday:''}</span>
+                        <span className="tabular font-semibold">{parts?parts.day:''}</span>
+                        <span className={isOn?'tabular text-xs text-ink/60':'tabular text-xs text-ash'}>{bucket.count}</span>
                     </button>
                 );
             })}

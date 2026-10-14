@@ -3,41 +3,50 @@
 // category from the API still lands in a sensible track.
 // ORDER MATTERS: the first track whose keyword matches wins.
 // ("Artificial Intelligence" must hit Code & AI before "art" hits Art & Design.)
+//
+// Each track has its own colour. It tints the poster photos and marks the track
+// everywhere else, so colour always means something (which track an event is in).
 
 export const TRACKS=[
     {
         id:'code',
+        color:'#6F8CFF',
         label:'Code & AI',
         keywords:['coding','code','hackathon','artificial','intelligence',' ai','web','cyber','security','software','data','machine learning','programming']
     },
     {
         id:'machines',
+        color:'#C6F135',
         label:'Robotics & Engineering',
         keywords:['robot','aerial','drone','electronic','engineering','hardware','mechanical','civil']
     },
     {
         id:'stage',
+        color:'#FF4F9A',
         label:'Stage',
         keywords:['dance','music','theatre','theater','drama','band','perform']
     },
     {
         id:'words',
+        color:'#FFC53D',
         label:'Words & Ideas',
         keywords:['debate','literary','poetry','quiz','entrepreneur','business','speaking','writing']
     },
     {
         id:'visual',
+        color:'#FF7A3D',
         label:'Art & Design',
         keywords:['design','art','photo','film','media','craft','illustration','visual']
     },
     {
         id:'explore',
+        color:'#3EE6C1',
         label:'Play & Explore',
         keywords:['gaming','esports','food','culture','sustainab','astronomy','science','nature']
     }
 ];
 
-export const OTHER_TRACK={id:'other',label:'More',keywords:[]};
+export const OTHER_TRACK={id:'other',label:'More',color:'#B9B4AA',keywords:[]};
 
 export const getTrackForCategory=(category)=>{
     if(typeof category!=='string'||category.trim()===''){

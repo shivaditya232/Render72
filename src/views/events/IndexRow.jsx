@@ -20,7 +20,7 @@ const IndexRow=({event,number,tokens,saved,onToggleSave,now})=>{
     const time=isMultiDay(event.start,event.end)?'Until '+formatShortDate(event.end):formatTimeRange(event.start,event.end);
 
     return (
-        <article className="group relative grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-b border-line py-4 transition-colors hover:bg-graphite/60 md:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_9.5rem_auto] md:gap-x-6 md:px-2 xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_8rem_9.5rem_auto] 2xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_8.5rem_8rem_9.5rem_auto]">
+        <article className="group relative grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-b border-line py-4 transition-colors hover:bg-graphite/60 md:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_10.75rem_auto] md:gap-x-6 md:px-2 xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_8rem_10.75rem_auto] 2xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_8.5rem_8rem_10.75rem_auto]">
             <span className="label-mono row-span-2 self-start pt-1 text-ash md:row-span-1 md:self-center md:pt-0">{formatPosterNumber(number).replace('No. ','')}</span>
 
             <div className="hidden md:block">
@@ -37,8 +37,9 @@ const IndexRow=({event,number,tokens,saved,onToggleSave,now})=>{
                     </Link>
                 </h3>
                 <p className="mt-0.5 truncate text-xs text-ash">
+                    <span aria-hidden="true" className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full align-middle" style={{backgroundColor:event.track.color}}/>
                     <span className="md:hidden">{date?date.weekday+' '+date.day+' '+date.month+' · ':''}</span>
-                    {event.track.label}
+                    <span style={{color:event.track.color}}>{event.track.label}</span>
                     <span className="hidden md:inline 2xl:hidden"> · {team}</span>
                     <span className="hidden md:inline xl:hidden"> · {priceText}</span>
                     {event.mode==='ONLINE'?' · Online':''}

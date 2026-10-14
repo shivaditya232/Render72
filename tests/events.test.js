@@ -301,3 +301,24 @@ describe('plan store',()=>{
         expect(getPlanIds()).toEqual([]);
     });
 });
+
+describe('day sections and track colours',()=>{
+    it('splits a sorted list into day sections, keeping its order',async ()=>{
+        const {splitIntoDays}=await import('../src/utils/schedule');
+        const upcoming=applyFilters(events,createDefaultState());
+        const sections=splitIntoDays(upcoming);
+        expect(sections.map((s)=>s.key)).toEqual(['2026-10-18','2026-11-13','2026-11-14','2026-11-15']);
+        expect(sections.map((s)=>s.events.length)).toEqual([1,8,10,9]);
+        const past=splitIntoDays(applyFilters(events,{...createDefaultState(),when:'past'}));
+        expect(past.map((s)=>s.key)).toEqual(['2026-09-27','2026-09-26']);
+        const withUndated=splitIntoDays([normalizeEvent({id:'nodate'},NOW),upcoming[0]]);
+        expect(withUndated.map((s)=>s.key)).toEqual([upcoming[0].start?'2026-10-18':'','tba'].filter(Boolean));
+    });
+
+    it('gives every event a track colour',()=>{
+        for(let i=0;i<events.length;i++){
+            expect(events[i].track.color).toMatch(/^#[0-9A-F]{6}$/i);
+        }
+        expect(normalizeEvent({id:'x'},NOW).track.color).toBe('#B9B4AA');
+    });
+});

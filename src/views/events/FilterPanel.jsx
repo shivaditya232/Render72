@@ -7,12 +7,19 @@ const ROW_OFF='flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left t
 
 // All filter groups. Every option shows how many events it would give you,
 // and options that would lead to zero results are dimmed (unless already on).
-// layout: 'chips' (mobile sheet) | 'list' (desktop sidebar, one tidy row per option)
-const FilterPanel=({facets,counts,onToggle,idPrefix,layout})=>{
+// layout: 'chips' (default) | 'list' (one tidy row per option)
+// excludeKeys: facets shown elsewhere on the page (e.g. the track bar) are left out here.
+const FilterPanel=({facets,counts,onToggle,idPrefix,layout,excludeKeys})=>{
     const isList=layout==='list';
+    const shownFacets=[];
+    for(let i=0;i<FACETS.length;i++){
+        if(!excludeKeys||!excludeKeys.includes(FACETS[i].key)){
+            shownFacets.push(FACETS[i]);
+        }
+    }
     return (
         <div className={isList?'space-y-7':'space-y-6'}>
-            {FACETS.map((facet)=>{
+            {shownFacets.map((facet)=>{
                 const headingId=(idPrefix||'filters')+'-'+facet.key;
                 return (
                     <section key={facet.key} aria-labelledby={headingId}>

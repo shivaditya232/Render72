@@ -207,8 +207,10 @@
 }
 
 /* ---------- Two-tone posters ---------- */
-/* Every cover becomes ink + signal blue, so 30 unrelated photos read as one series.
-   Under a mouse, a soft spotlight brings the real colours back. */
+/* Every cover becomes a two-tone print in its track's colour (--tint):
+   shadows go to a deep shade of the colour, highlights to the bright colour.
+   30 unrelated stock photos read as one designed series, and the colour tells
+   you the track. Under a mouse, a soft spotlight brings the real colours back. */
 
 .duotone{
     position:relative;
@@ -217,23 +219,36 @@
     background-color:var(--color-graphite);
 }
 
-.duotone > img{
+.duotone img,
+.duotone picture{
     position:absolute;
     inset:0;
     width:100%;
     height:100%;
+}
+
+.duotone img{
     object-fit:cover;
 }
 
 .duotone .duo-base{
-    filter:grayscale(1) contrast(1.15) brightness(0.92);
+    filter:grayscale(1) contrast(1.2) brightness(1.08);
 }
 
+/* Highlights take the colour. */
 .duotone .duo-tint{
     position:absolute;
     inset:0;
-    background-color:var(--color-signal);
+    background-color:var(--tint,var(--color-signal));
     mix-blend-mode:multiply;
+}
+
+/* Shadows lift from pure black to a deep shade of the same colour. */
+.duotone .duo-lift{
+    position:absolute;
+    inset:0;
+    background-color:color-mix(in srgb,var(--tint,var(--color-signal)) 26%,#0B0B0D);
+    mix-blend-mode:lighten;
 }
 
 .duotone .duo-reveal{

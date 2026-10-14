@@ -87,3 +87,29 @@ export const groupByDay=(events)=>{
     }
     return result;
 };
+
+// Splits an already-sorted list into day sections, keeping the list's own order
+// (soonest first for upcoming, most recent first for past). Events with no date go
+// into a final 'tba' section. Used for the day headings on the events page.
+export const splitIntoDays=(events)=>{
+    const sections=[];
+    let current=null;
+    const undated=[];
+    for(let i=0;i<events.length;i++){
+        const event=events[i];
+        const key=getIstDateKey(event.start);
+        if(!key){
+            undated.push(event);
+            continue;
+        }
+        if(!current||current.key!==key){
+            current={key,start:event.start,events:[]};
+            sections.push(current);
+        }
+        current.events.push(event);
+    }
+    if(undated.length>0){
+        sections.push({key:'tba',start:null,events:undated});
+    }
+    return sections;
+};
