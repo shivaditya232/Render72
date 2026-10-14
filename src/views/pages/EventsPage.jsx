@@ -26,7 +26,7 @@ import useFlipAnimation from '../../controllers/useFlipAnimation';
 import useDocumentTitle from '../../controllers/useDocumentTitle';
 import {getQueryTokens} from '../../utils/filterEvents';
 import {splitIntoDays} from '../../utils/schedule';
-import {compareByStart} from '../../models/eventModel';
+import {getPosterNumbers} from '../../utils/landing';
 
 const EventsPage=()=>{
     useDocumentTitle('All events');
@@ -39,12 +39,7 @@ const EventsPage=()=>{
 
     // Poster numbers follow the full programme order, so "No. 07" never changes while filtering.
     const posterNumbers=useMemo(()=>{
-        const ordered=events.slice().sort(compareByStart);
-        const numbers={};
-        for(let i=0;i<ordered.length;i++){
-            numbers[ordered[i].id]=i+1;
-        }
-        return numbers;
+        return getPosterNumbers(events);
     },[events]);
 
     // One "now" per data load keeps every card's status consistent with each other.

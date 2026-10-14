@@ -2,11 +2,12 @@ import Icon from './Icon';
 import {getErrorCopy} from '../../config/messages';
 
 // Shown when there is nothing at all to display (no cache, no bundled copy).
-const ErrorState=({error,onRetry,isRetrying})=>{
+// "compact" trims the spacing when it sits inside another section (the landing hero).
+const ErrorState=({error,onRetry,isRetrying,compact})=>{
     const copy=getErrorCopy(error);
     const isOffline=error&&error.kind==='offline';
     return (
-        <div role="alert" className="flex max-w-xl flex-col items-start gap-5 py-16">
+        <div role="alert" className={'flex max-w-xl flex-col items-start gap-5 '+(compact?'border-t border-line pt-8':'py-16')}>
             <span className="flex h-11 w-11 items-center justify-center rounded-full border border-line text-ash">
                 <Icon name={isOffline?'wifiOff':'alert'} size={20}/>
             </span>
