@@ -194,3 +194,21 @@ export const padTwo=(value)=>{
 export const formatPosterNumber=(position)=>{
     return 'No. '+padTwo(position);
 };
+
+// Same day: '9:30 AM – 1:30 PM'. Across days: 'Fri 6:00 PM – Sat 6:00 PM'.
+export const formatSpan=(startMs,endMs)=>{
+    if(!isValidTime(startMs)){
+        return '';
+    }
+    if(!isValidTime(endMs)||getIstDateKey(startMs)===getIstDateKey(endMs)){
+        return formatTimeRange(startMs,endMs);
+    }
+    return weekdayFormatter.format(startMs)+' '+formatTime(startMs)+' – '+weekdayFormatter.format(endMs)+' '+formatTime(endMs);
+};
+
+export const isMultiDay=(startMs,endMs)=>{
+    if(!isValidTime(startMs)||!isValidTime(endMs)){
+        return false;
+    }
+    return getIstDateKey(startMs)!==getIstDateKey(endMs);
+};
