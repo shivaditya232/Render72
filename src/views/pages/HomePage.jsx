@@ -8,7 +8,7 @@ import HeroSection from '../home/HeroSection';
 import StatsStrip from '../home/StatsStrip';
 import ClosingSoon from '../home/ClosingSoon';
 import FeaturedPosters from '../home/FeaturedPosters';
-import DaysAtAGlance from '../home/DaysAtAGlance';
+import TimetableTeaser from '../home/TimetableTeaser';
 import useEvents from '../../controllers/useEvents';
 import useDocumentTitle from '../../controllers/useDocumentTitle';
 import {getFestWindow,getTrackSummaries,getClosingSoon,getFeatured,getProgrammeStats,getPosterNumbers} from '../../utils/landing';
@@ -80,7 +80,7 @@ const HomePage=()=>{
                         <FeaturedPosters events={derived.featured} posterNumbers={derived.posterNumbers} now={now}/>
                     </SectionBoundary>
                     <SectionBoundary label="The timetable">
-                        <DaysAtAGlance festWindow={derived.festWindow} now={now}/>
+                        <TimetableTeaser festWindow={derived.festWindow} events={events}/>
                     </SectionBoundary>
 
                     <section className="page-gutter" aria-labelledby="cta-title">

@@ -554,3 +554,69 @@ details.faq-item[open] .faq-plus{
         transform:none !important;
     }
 }
+
+/* ---------- Timetable (track lines) ---------- */
+
+dialog.r72-dialog[open].full{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100dvh;
+    animation:sheet-in 0.36s var(--ease-out-quint);
+}
+
+/* ---------- Closing soon as tickets ---------- */
+/* Desktop: a loose fan of overlapping tickets. The one under the cursor straightens and
+   lifts out, its neighbours make room, and its stub tears half off to show the deadline. */
+
+.ticket{
+    --r:0deg;
+    transform:rotate(var(--r));
+    transition:transform 0.55s var(--ease-out-quint),translate 0.55s var(--ease-out-quint);
+}
+
+.ticket-stub{
+    transform-origin:0 0;
+    transition:transform 0.55s var(--ease-out-quint);
+}
+
+@media (min-width:1024px){
+    .ticket-fan > li + li{
+        margin-left:-3rem;
+    }
+    .ticket-fan > li:nth-child(odd) .ticket{
+        translate:0 10px;
+    }
+}
+
+@media (hover:hover) and (pointer:fine){
+    .ticket-fan > li:hover{
+        z-index:10;
+    }
+    .ticket-fan > li:hover .ticket{
+        transform:rotate(0deg) scale(1.03);
+        translate:0 -14px;
+    }
+    .ticket-fan > li:hover .ticket-stub{
+        transform:rotate(7deg) translate(6px,2px);
+    }
+    @media (min-width:1024px){
+        .ticket-fan > li:hover ~ li .ticket{
+            translate:2.25rem 10px;
+        }
+        .ticket-fan > li:has(~ li:hover) .ticket{
+            translate:-2.25rem 10px;
+        }
+    }
+}
+
+.ticket-fan > li:focus-within{
+    z-index:10;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .ticket,
+    .ticket-stub{
+        transition:none;
+    }
+}
