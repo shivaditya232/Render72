@@ -27,6 +27,7 @@ import useDocumentTitle from '../../controllers/useDocumentTitle';
 import {getQueryTokens} from '../../utils/filterEvents';
 import {splitIntoDays} from '../../utils/schedule';
 import {getPosterNumbers} from '../../utils/landing';
+import SwellText from '../components/SwellText';
 
 const EventsPage=()=>{
     useDocumentTitle('All events','Every event on the programme. Search, filter by track, day, fee and team size, and save the ones you want to a plan that flags clashes.');
@@ -99,9 +100,7 @@ const EventsPage=()=>{
                 <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                     <div>
                         <p className="label-mono text-ash">The programme</p>
-                        <h1 className="condensed mt-3 text-[clamp(2.75rem,7vw,5.5rem)] font-extrabold leading-[0.9] tracking-tight">
-                            All events
-                        </h1>
+                        <SwellText className="condensed mt-3 text-[clamp(2.75rem,7vw,5.5rem)] font-extrabold leading-[0.9] tracking-tight" lines="All events"/>
                     </div>
                     {status==='ready'?(
                         <WhenTabs value={filters.state.when} counts={filters.whenCounts} onChange={filters.setWhen}/>
@@ -126,7 +125,7 @@ const EventsPage=()=>{
                         <button
                             type="button"
                             onClick={openFilters}
-                            className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-line px-4 py-2 text-sm font-medium text-bone transition-colors hover:border-ash"
+                            className="fx-fill inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-line px-4 py-2 text-sm font-medium text-bone"
                         >
                             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
                             More filters
@@ -136,7 +135,7 @@ const EventsPage=()=>{
                         </button>
                     </div>
                 ):null}
-                {status==='loading'?<div aria-hidden="true" className="skeleton mt-5 h-[92px] rounded-2xl md:h-[88px] lg:h-[42px]"/>:null}
+                {status==='loading'?<div aria-hidden="true" className="skeleton mt-5 h-[101px] rounded-2xl md:h-[60px]"/>:null}
 
                 <div className="mt-6">
                     <div className="min-w-0 space-y-6">

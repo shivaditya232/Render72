@@ -36,7 +36,7 @@ const ClosingSoon=({events,now})=>{
                                         </span>
                                         <span className="label-mono text-ash">{String(index+1).padStart(2,'0')}</span>
                                     </div>
-                                    <h3 className="condensed text-[1.625rem] font-bold leading-[1.02] tracking-tight text-bone group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                                    <h3 className="condensed text-[1.625rem] font-bold leading-[1.02] tracking-tight text-bone">
                                         {event.name}
                                     </h3>
                                     <div className="mt-auto space-y-4">

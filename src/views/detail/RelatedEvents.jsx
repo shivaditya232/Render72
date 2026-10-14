@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
 import PosterCard from '../events/PosterCard';
 import Icon from '../components/Icon';
+import RollText from '../components/RollText';
 
 // "More like this": same track first, then whatever's coming up soonest.
 const RelatedEvents=({events,current,posterNumbers,isSaved,onToggleSave,now})=>{
@@ -24,8 +25,8 @@ const RelatedEvents=({events,current,posterNumbers,isSaved,onToggleSave,now})=>{
                     <p className="label-mono text-ash">Keep exploring</p>
                     <h2 id="related-title" className="condensed mt-2 text-[clamp(2rem,4vw,2.75rem)] font-extrabold leading-[0.95] tracking-tight">{title}</h2>
                 </div>
-                <Link to="/events" className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-signal-soft underline-offset-4 hover:underline">
-                    All events
+                <Link to="/events" className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-signal-soft">
+                    <RollText text="All events"/>
                     <Icon name="arrowRight" size={16}/>
                 </Link>
             </div>

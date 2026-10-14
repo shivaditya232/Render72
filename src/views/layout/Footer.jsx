@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import Wordmark from '../components/Wordmark';
+import RollText from '../components/RollText';
 
 const Footer=()=>{
     return (
@@ -13,8 +14,8 @@ const Footer=()=>{
                 </div>
                 <nav aria-label="Footer">
                     <ul className="flex gap-6 text-sm">
-                        <li><Link to="/" className="text-ash transition-colors hover:text-bone">Programme</Link></li>
-                        <li><Link to="/events" className="text-ash transition-colors hover:text-bone">All events</Link></li>
+                        <li><Link to="/" className="text-ash transition-colors hover:text-bone"><RollText text="Programme"/></Link></li>
+                        <li><Link to="/events" className="text-ash transition-colors hover:text-bone"><RollText text="All events"/></Link></li>
                     </ul>
                 </nav>
             </div>

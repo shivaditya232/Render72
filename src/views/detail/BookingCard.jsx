@@ -32,7 +32,7 @@ const ActionButton=({onClick,icon,label,pressed,children})=>{
             type="button"
             onClick={onClick}
             aria-pressed={pressed}
-            className={pressed?'inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full bg-bone px-3 text-sm font-medium text-ink transition-colors':'inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-line px-3 text-sm font-medium text-bone transition-colors hover:border-ash'}
+            className={pressed?'inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full bg-bone px-3 text-sm font-medium text-ink transition-colors':'fx-fill inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-line px-3 text-sm font-medium text-bone'}
         >
             <Icon name={icon} size={16} className={pressed&&icon==='bookmark'?'fill-current':''}/>
             {children||label}
@@ -101,7 +101,7 @@ const BookingCard=({event,availability,now,isSaved,onToggleSave,clashes,onRegist
                                 return (
                                     <span key={other.id}>
                                         {index>0?(index===clashes.length-1?' and ':', '):''}
-                                        <Link to={'/events/'+other.id} className="font-medium underline decoration-few/60 underline-offset-4 hover:decoration-few">{other.name}</Link>
+                                        <Link to={'/events/'+other.id} className="font-semibold text-few transition-colors hover:text-bone">{other.name}</Link>
                                     </span>
                                 );
                             })}
@@ -114,7 +114,7 @@ const BookingCard=({event,availability,now,isSaved,onToggleSave,clashes,onRegist
                     <button
                         type="button"
                         onClick={onRegister}
-                        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-signal px-6 text-[0.9375rem] font-semibold text-bone transition-colors hover:bg-[#2747E6]"
+                        className="fx-magnet inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-signal px-6 text-[0.9375rem] font-semibold text-bone hover:bg-[#2747E6]"
                     >
                         <Icon name="ticket" size={18}/>
                         Register

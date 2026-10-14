@@ -20,7 +20,7 @@ const ErrorState=({error,onRetry,isRetrying,compact})=>{
                     type="button"
                     onClick={onRetry}
                     disabled={isRetrying}
-                    className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-medium text-bone transition-colors hover:border-ash disabled:opacity-60"
+                    className="fx-fill inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-medium text-bone disabled:opacity-60"
                 >
                     <Icon name="refresh" size={16} className={isRetrying?'animate-spin':''}/>
                     {isRetrying?'Trying again…':'Try again'}

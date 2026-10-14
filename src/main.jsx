@@ -4,6 +4,7 @@ import {RouterProvider} from 'react-router';
 import appRouter from './routes/appRouter';
 import './styles/index.css';
 import {printConsoleNote} from './utils/consoleNote';
+import {installPointerEffects} from './utils/pointerEffects';
 
 const rootElement=document.getElementById('root');
 
@@ -14,3 +15,4 @@ createRoot(rootElement).render(
 );
 
 printConsoleNote();
+installPointerEffects();

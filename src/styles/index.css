@@ -432,3 +432,125 @@ details.faq-item[open] .faq-plus{
         transform:scale(1.04);
     }
 }
+
+/* ---------- Living interface (Session 6A) ---------- */
+/* One behaviour per kind of element, used the same way everywhere:
+   pills fill with colour from where the cursor came in, text links roll their letters,
+   main buttons lean towards the cursor, big headlines respond letter by letter. */
+
+/* Poster spotlight: a small circle of real colour appears at the cursor, then slowly
+   widens until the whole photo is in colour. It shrinks back when the cursor leaves. */
+@property --reveal-r{
+    syntax:'<length>';
+    inherits:true;
+    initial-value:0px;
+}
+
+.duotone .duo-reveal{
+    -webkit-mask-image:radial-gradient(circle var(--reveal-r) at var(--x,50%) var(--y,40%),#000 55%,transparent 100%);
+    mask-image:radial-gradient(circle var(--reveal-r) at var(--x,50%) var(--y,40%),#000 55%,transparent 100%);
+    transition:opacity 0.5s var(--ease-out-quint),--reveal-r 0.7s cubic-bezier(0.4,0,0.6,1);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .poster-card:hover .duo-reveal{
+        --reveal-r:var(--reveal-max,1400px);
+        /* Slow start (a small circle), then it opens up across the photo. */
+        transition:opacity 0.3s var(--ease-out-quint),--reveal-r 2.2s cubic-bezier(0.75,0,0.25,1);
+    }
+}
+
+/* Pills and secondary buttons: colour floods in from the point the cursor entered.
+   --fx/--fy are written by utils/pointerEffects.js. */
+@layer components{
+    .fx-fill{
+        position:relative;
+        isolation:isolate;
+        overflow:hidden;
+    }
+    .fx-fill::before{
+        content:'';
+        position:absolute;
+        inset:0;
+        z-index:-1;
+        border-radius:inherit;
+        background-color:var(--fill,var(--color-bone));
+        clip-path:circle(0% at var(--fx,50%) var(--fy,50%));
+        transition:clip-path 0.5s var(--ease-out-quint);
+    }
+}
+
+@media (hover:hover) and (pointer:fine){
+    .fx-fill:not(:disabled):not([aria-pressed="true"]):hover::before{
+        clip-path:circle(160% at var(--fx,50%) var(--fy,50%));
+    }
+    .fx-fill:not(:disabled):not([aria-pressed="true"]):hover{
+        color:var(--fill-ink,var(--color-ink));
+        border-color:var(--fill,var(--color-bone));
+    }
+}
+
+/* Text links: the letters roll up one after another and a fresh copy rolls in. */
+.fx-roll{
+    display:inline-grid;
+    overflow:hidden;
+    vertical-align:bottom;
+    /* Room for descenders (g, y) so the clip doesn't cut them. */
+    padding-block:0.12em;
+    margin-block:-0.12em;
+}
+
+.fx-roll > span{
+    grid-area:1/1;
+    white-space:pre;
+}
+
+.fx-roll .fx-ch{
+    display:inline-block;
+    transition:transform 0.42s var(--ease-out-quint);
+    transition-delay:calc(var(--i,0) * 14ms);
+}
+
+.fx-roll > span:last-child .fx-ch{
+    transform:translateY(105%);
+}
+
+@media (hover:hover) and (pointer:fine){
+    :is(a,button):hover .fx-roll > span:first-child .fx-ch,
+    :is(a,button):focus-visible .fx-roll > span:first-child .fx-ch{
+        transform:translateY(-105%);
+    }
+    :is(a,button):hover .fx-roll > span:last-child .fx-ch,
+    :is(a,button):focus-visible .fx-roll > span:last-child .fx-ch{
+        transform:none;
+    }
+}
+
+/* Main buttons: lean towards the cursor (utils/pointerEffects.js) and press in on click. */
+.fx-magnet{
+    transition:transform 0.35s var(--ease-out-quint),background-color 0.2s,border-color 0.2s;
+    will-change:transform;
+}
+
+.fx-magnet:active{
+    scale:0.96;
+}
+
+/* Living headlines: each letter is its own span so its weight and width can change.
+   Inline (not inline-block) on purpose: the headline stays one block of text, which is
+   what the browser measures as the page's main content when timing the load. */
+.swell-word{
+    white-space:nowrap;
+}
+
+@media (prefers-reduced-motion:reduce){
+    .duotone .duo-reveal{
+        transition:none;
+    }
+    .fx-roll .fx-ch{
+        transition:none;
+    }
+    .fx-magnet{
+        transform:none !important;
+    }
+}

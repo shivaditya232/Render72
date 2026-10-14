@@ -52,7 +52,7 @@ const PeopleSection=({event})=>{
                                 </div>
                             </div>
                             {contact&&contact.href?(
-                                <a href={contact.href} className="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-signal-soft underline-offset-4 hover:underline">
+                                <a href={contact.href} className="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-signal-soft transition-colors hover:text-bone">
                                     <Icon name={contact.href.startsWith('mailto:')?'mail':'phone'} size={15} className="shrink-0"/>
                                     <span className="truncate">{contact.label}</span>
                                 </a>

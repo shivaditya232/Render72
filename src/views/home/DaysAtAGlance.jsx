@@ -48,7 +48,7 @@ const DaysAtAGlance=({festWindow,now})=>{
                                                     <span className="min-w-0">
                                                         <span className="flex items-center gap-2">
                                                             <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{backgroundColor:event.track.color}}/>
-                                                            <span className="truncate text-[0.9375rem] font-medium text-bone group-hover:underline group-hover:underline-offset-4">{event.name}</span>
+                                                            <span className="truncate text-[0.9375rem] font-medium text-bone transition-colors group-hover:text-signal-soft">{event.name}</span>
                                                         </span>
                                                         <span className="mt-0.5 flex items-center gap-2 pl-4 text-xs text-ash">
                                                             <span>{event.track.label}</span>

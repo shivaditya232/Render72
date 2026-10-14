@@ -57,7 +57,7 @@ const SectionNav=({sections,activeId})=>{
                                 onClick={(clickEvent)=>{
                                     onJump(clickEvent,section.id);
                                 }}
-                                className={isActive?'inline-flex h-9 items-center rounded-full bg-bone px-4 text-sm font-medium text-ink transition-colors':'inline-flex h-9 items-center rounded-full border border-line px-4 text-sm font-medium text-ash transition-colors hover:border-ash hover:text-bone'}
+                                className={isActive?'inline-flex h-9 items-center rounded-full bg-bone px-4 text-sm font-medium text-ink transition-colors':'fx-fill inline-flex h-9 items-center rounded-full border border-line px-4 text-sm font-medium text-ash'}
                             >
                                 {section.label}
                             </a>

@@ -14,7 +14,7 @@ const WhenTabs=({value,counts,onChange})=>{
                         onClick={()=>{
                             onChange(option.value);
                         }}
-                        className={isOn?'rounded-full bg-bone px-4 py-1.5 text-sm font-semibold text-ink':'rounded-full px-4 py-1.5 text-sm font-medium text-ash transition-colors hover:text-bone'}
+                        className={isOn?'rounded-full bg-bone px-4 py-1.5 text-sm font-semibold text-ink':'fx-fill rounded-full px-4 py-1.5 text-sm font-medium text-ash'}
                     >
                         {option.label}
                         <span className={isOn?'tabular ml-1.5 text-ink/60':'tabular ml-1.5 text-ash/70'}>{counts[option.value]}</span>

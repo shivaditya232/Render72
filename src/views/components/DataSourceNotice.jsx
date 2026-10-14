@@ -1,4 +1,5 @@
 import Icon from './Icon';
+import RollText from './RollText';
 import {formatRelative,formatShortDate} from '../../utils/formatters';
 
 // A slim, honest line when what's on screen isn't live:
@@ -34,10 +35,10 @@ const DataSourceNotice=({source,savedAt,error,onRetry,isRefreshing})=>{
                     type="button"
                     onClick={onRetry}
                     disabled={isRefreshing}
-                    className="inline-flex items-center gap-1.5 font-medium text-few underline-offset-4 hover:underline disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 font-medium text-few disabled:opacity-60"
                 >
                     <Icon name="refresh" size={14} className={isRefreshing?'animate-spin':''}/>
-                    {isRefreshing?'Checking…':'Try live again'}
+                    <RollText text={isRefreshing?'Checking…':'Try live again'}/>
                 </button>
             ):null}
         </div>

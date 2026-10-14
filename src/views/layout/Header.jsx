@@ -2,12 +2,14 @@ import {Link,NavLink} from 'react-router';
 import Wordmark from '../components/Wordmark';
 import Icon from '../components/Icon';
 import usePlan from '../../controllers/usePlan';
+import RollText from '../components/RollText';
 
 const getNavClass=({isActive})=>{
     if(isActive){
-        return 'relative py-1 text-sm font-medium text-bone after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-bone';
+        // The current page is marked with a small dot, not an underline.
+        return 'relative inline-flex items-center gap-2 py-1 text-sm font-medium text-bone before:h-1.5 before:w-1.5 before:rounded-full before:bg-signal-soft';
     }
-    return 'relative py-1 text-sm font-medium text-ash transition-colors hover:text-bone';
+    return 'relative inline-flex items-center py-1 text-sm font-medium text-ash transition-colors hover:text-bone';
 };
 
 const Header=({onOpenPlan})=>{
@@ -21,12 +23,12 @@ const Header=({onOpenPlan})=>{
                 <nav aria-label="Main" className="flex items-center gap-5 sm:gap-7">
                     <ul className="flex items-center gap-5 sm:gap-7">
                         <li className="hidden sm:block">
-                            <NavLink to="/" end className={getNavClass}>Programme</NavLink>
+                            <NavLink to="/" end className={getNavClass}><RollText text="Programme"/></NavLink>
                         </li>
                         <li>
                             <NavLink to="/events" className={getNavClass}>
-                                <span className="sm:hidden">Events</span>
-                                <span className="hidden sm:inline">All events</span>
+                                <span className="sm:hidden"><RollText text="Events"/></span>
+                                <span className="hidden sm:inline"><RollText text="All events"/></span>
                             </NavLink>
                         </li>
                     </ul>
@@ -34,7 +36,7 @@ const Header=({onOpenPlan})=>{
                         <button
                             type="button"
                             onClick={onOpenPlan}
-                            className="inline-flex items-center gap-2 rounded-full border border-line py-1.5 pl-3 pr-1.5 text-sm font-medium text-bone transition-colors hover:border-ash"
+                            className="fx-fill inline-flex items-center gap-2 rounded-full border border-line py-1.5 pl-3 pr-1.5 text-sm font-medium text-bone"
                         >
                             {/* Named by its own text ("Your plan 2 events saved"), so what you see is what a screen reader says. */}
                             <Icon name="bookmark" size={15} className={plan.count>0?'fill-current':''}/>

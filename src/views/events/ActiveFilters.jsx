@@ -33,7 +33,7 @@ const ActiveFilters=({filters,onRemove,onClearAll})=>{
             <button
                 type="button"
                 onClick={onClearAll}
-                className="px-2 py-1.5 text-[0.8125rem] font-medium text-signal-soft underline-offset-4 hover:underline"
+                className="px-2 py-1.5 text-[0.8125rem] font-medium text-signal-soft transition-colors hover:text-bone"
             >
                 Clear all
             </button>

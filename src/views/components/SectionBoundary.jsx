@@ -28,7 +28,7 @@ class SectionBoundary extends Component{
             return (
                 <div role="alert" className="rounded-xl border border-line px-5 py-4 text-sm text-ash">
                     {this.props.label?this.props.label+' couldn’t be shown.':'This part couldn’t be shown.'}{' '}
-                    <button type="button" onClick={this.reset} className="font-medium text-bone underline underline-offset-4">
+                    <button type="button" onClick={this.reset} className="font-semibold text-signal-soft transition-colors hover:text-bone">
                         Try again
                     </button>
                 </div>

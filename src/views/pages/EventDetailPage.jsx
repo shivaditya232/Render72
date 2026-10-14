@@ -28,6 +28,8 @@ import useShare from '../../controllers/useShare';
 import {getAvailability} from '../../utils/availability';
 import {getDetailSections,getVenueText,getTimeSummary} from '../../utils/eventDetail';
 import {formatDateRange,formatTeamSize} from '../../utils/formatters';
+import SwellText from '../components/SwellText';
+import RollText from '../components/RollText';
 
 // Which component draws which section (the order comes from getDetailSections).
 const SECTION_VIEWS={
@@ -105,7 +107,7 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
                             {event.category}
                             {event.type==='WORKSHOP'?<span>· Workshop</span>:null}
                         </p>
-                        <h1 className="condensed mt-4 text-[clamp(2.75rem,7.5vw,5.75rem)] font-extrabold leading-[0.88] tracking-tight [overflow-wrap:anywhere]">{event.name}</h1>
+                        <SwellText className="condensed mt-4 text-[clamp(2.75rem,7.5vw,5.75rem)] font-extrabold leading-[0.88] tracking-tight" lines={event.name}/>
                         <ul className="mt-6 grid gap-x-6 gap-y-2.5 text-[0.9375rem] text-bone/85 sm:grid-cols-2">
                             {facts.map((fact,index)=>{
                                 return (
@@ -123,7 +125,7 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
                                         <li key={tag}>
                                             <Link
                                                 to={'/events?q='+encodeURIComponent(tag)}
-                                                className="inline-flex h-8 items-center rounded-full border border-line px-3 text-[0.8125rem] text-ash transition-colors hover:border-ash hover:text-bone"
+                                                className="fx-fill inline-flex h-8 items-center rounded-full border border-line px-3 text-[0.8125rem] text-ash"
                                             >
                                                 {tag}
                                             </Link>
@@ -230,7 +232,7 @@ const EventDetailPage=()=>{
             <div className="mx-auto max-w-[1440px] pb-8 pt-6 sm:pt-8">
                 <Link to="/events" className="label-mono mb-6 inline-flex min-h-11 items-center gap-1.5 text-ash transition-colors hover:text-bone">
                     <Icon name="arrowLeft" size={14}/>
-                    All events
+                    <RollText text="All events"/>
                 </Link>
 
                 {status==='loading'?<DetailSkeleton/>:null}

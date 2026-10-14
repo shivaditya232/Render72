@@ -20,7 +20,7 @@ const ViewToggle=({value,onChange})=>{
                         onClick={()=>{
                             onChange(option.value);
                         }}
-                        className={isOn?'flex h-9 w-9 items-center justify-center rounded-full bg-bone text-ink':'flex h-9 w-9 items-center justify-center rounded-full text-ash transition-colors hover:text-bone'}
+                        className={isOn?'flex h-9 w-9 items-center justify-center rounded-full bg-bone text-ink':'fx-fill flex h-9 w-9 items-center justify-center rounded-full text-ash'}
                     >
                         <Icon name={option.icon} size={17}/>
                     </button>

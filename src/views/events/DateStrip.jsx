@@ -9,7 +9,7 @@ const DateStrip=({buckets,selected,onSelect,totalCount})=>{
     }
     const baseClass='relative inline-flex shrink-0 items-baseline gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors';
     const onClass=' border-bone bg-bone text-ink';
-    const offClass=' border-line text-bone hover:border-ash';
+    const offClass=' fx-fill border-line text-bone';
 
     return (
         <div role="group" aria-label="Filter by day" className="scroll-row -mx-4 flex gap-2 px-4 sm:mx-0 sm:px-0">

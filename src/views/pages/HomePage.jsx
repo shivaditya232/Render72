@@ -12,6 +12,7 @@ import DaysAtAGlance from '../home/DaysAtAGlance';
 import useEvents from '../../controllers/useEvents';
 import useDocumentTitle from '../../controllers/useDocumentTitle';
 import {getFestWindow,getTrackSummaries,getClosingSoon,getFeatured,getProgrammeStats,getPosterNumbers} from '../../utils/landing';
+import SwellText from '../components/SwellText';
 
 const CLOSING_SOON_COUNT=4;
 
@@ -84,10 +85,8 @@ const HomePage=()=>{
 
                     <section className="page-gutter" aria-labelledby="cta-title">
                         <div className="mx-auto flex max-w-[1440px] flex-col items-start gap-8 border-t border-line pt-16 md:flex-row md:items-end md:justify-between">
-                            <h2 id="cta-title" className="condensed max-w-3xl text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.9] tracking-tight">
-                                Save what you like. We’ll flag the clashes.
-                            </h2>
-                            <Link to="/events" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-signal px-6 py-3.5 text-sm font-semibold text-bone transition-colors hover:bg-[#2747E6]">
+                            <SwellText as="h2" id="cta-title" className="condensed max-w-3xl text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.9] tracking-tight" lines="Save what you like. We’ll flag the clashes."/>
+                            <Link to="/events" className="fx-magnet inline-flex shrink-0 items-center gap-2 rounded-full bg-signal px-6 py-3.5 text-sm font-semibold text-bone hover:bg-[#2747E6]">
                                 Start planning
                                 <Icon name="arrowRight" size={16}/>
                             </Link>

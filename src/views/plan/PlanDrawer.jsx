@@ -137,7 +137,7 @@ const PlanContent=({onClose})=>{
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="min-w-0">
                                                         <p className="tabular text-xs text-ash">{formatSpan(event.start,event.end)}{event.isPast?' · Ended':''}</p>
-                                                        <Link to={'/events/'+event.id} onClick={close} className="mt-1 block font-semibold leading-snug text-bone hover:underline">
+                                                        <Link to={'/events/'+event.id} onClick={close} className="mt-1 block font-semibold leading-snug text-bone transition-colors hover:text-signal-soft">
                                                             {event.name}
                                                         </Link>
                                                         <p className="mt-1 text-xs text-ash">
@@ -179,7 +179,7 @@ const PlanContent=({onClose})=>{
                                         plan.toggle(planned.missing[i]);
                                     }
                                 }}
-                                className="font-medium text-bone underline underline-offset-4"
+                                className="font-semibold text-few transition-colors hover:text-bone"
                             >
                                 Remove {planned.missing.length===1?'it':'them'}
                             </button>
@@ -214,7 +214,7 @@ const PlanContent=({onClose})=>{
                             onBlur={()=>{
                                 setConfirmClear(false);
                             }}
-                            className={confirmClear?'rounded-full border border-full px-5 py-3 text-sm font-semibold text-full':'rounded-full border border-line px-5 py-3 text-sm font-medium text-bone hover:border-ash'}
+                            className={confirmClear?'rounded-full border border-full px-5 py-3 text-sm font-semibold text-full':'fx-fill rounded-full border border-line px-5 py-3 text-sm font-medium text-bone'}
                         >
                             {confirmClear?'Tap again to clear':'Clear plan'}
                         </button>

@@ -83,7 +83,7 @@ const RegisterContent=({event,onClose,isSaved,onToggleSave})=>{
                     <Icon name="bookmark" size={16} className={isSaved?'fill-current':''}/>
                     {isSaved?'Saved to your plan':'Save to your plan'}
                 </button>
-                <button type="button" onClick={onClose} className="inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-medium text-bone transition-colors hover:border-ash">
+                <button type="button" onClick={onClose} className="fx-fill inline-flex min-h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-medium text-bone">
                     Close
                 </button>
             </div>
