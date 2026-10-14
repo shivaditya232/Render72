@@ -5,7 +5,7 @@ import SaveButton from './SaveButton';
 import SeatsMeter from './SeatsMeter';
 import Highlight from './Highlight';
 import {getAvailability} from '../../utils/availability';
-import {getDateParts,formatSpan,formatPrice,formatTeamSize,formatPosterNumber,isMultiDay} from '../../utils/formatters';
+import {getDateParts,getTimeParts,formatSpan,formatPrice,formatTeamSize,formatPosterNumber,isMultiDay} from '../../utils/formatters';
 
 const POSTER_SIZES='(min-width:1536px) 330px, (min-width:1024px) 31vw, (min-width:640px) 46vw, 92vw';
 const WIDE_SIZES='(min-width:1536px) 680px, (min-width:1024px) 64vw, 92vw';
@@ -14,13 +14,16 @@ const WIDE_SIZES='(min-width:1536px) 680px, (min-width:1024px) 64vw, 92vw';
 // then the facts people scan for — time, place, team, fee, seats.
 // isFeatured: picked by the organisers; gets a "Featured" tag.
 // isWide: spans two columns with a wide cover and the blurb (featured events, or a day's only event).
-const PosterCard=({event,number,tokens,saved,onToggleSave,priority,now,isFeatured,isWide})=>{
+// stamp: 'date' (default) sets the day large on the cover; 'time' sets the start time instead,
+//        used under a day heading where repeating the date would say nothing new.
+const PosterCard=({event,number,tokens,saved,onToggleSave,priority,now,isFeatured,isWide,stamp})=>{
     const date=getDateParts(event.start);
     const availability=getAvailability(event,now);
     const price=formatPrice(event.price,event.isPerHead,event.maxTeam);
     const team=formatTeamSize(event.minTeam,event.maxTeam);
     const time=formatSpan(event.start,event.end);
     const spansDays=isMultiDay(event.start,event.end);
+    const timeParts=stamp==='time'?getTimeParts(event.start):null;
     const frameRef=useRef(null);
     const pending=useRef(false);
 
@@ -71,7 +74,17 @@ const PosterCard=({event,number,tokens,saved,onToggleSave,priority,now,isFeature
                 <div className="absolute right-3 top-3">
                     <SaveButton eventName={event.name} saved={saved} onToggle={onToggleSave}/>
                 </div>
-                {date?(
+                {timeParts?(
+                    <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-end gap-2.5 text-bone">
+                        <span className={isWide?'condensed tabular text-[clamp(3.75rem,7vw,5.75rem)] font-extrabold leading-[0.78] tracking-tight':'condensed tabular text-[3.75rem] font-extrabold leading-[0.78] tracking-tight'}>{timeParts.clock}</span>
+                        <span className="label-mono pb-1 leading-tight">
+                            {timeParts.meridiem}
+                            <br/>
+                            {spansDays?'Multi-day':'IST'}
+                        </span>
+                    </div>
+                ):null}
+                {!timeParts&&date?(
                     <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-end gap-3 text-bone">
                         <span className={isWide?'condensed tabular text-[clamp(4.25rem,8vw,6.5rem)] font-extrabold leading-[0.78] tracking-tight':'condensed tabular text-[4.25rem] font-extrabold leading-[0.78] tracking-tight'}>{date.day}</span>
                         <span className="label-mono pb-1 leading-tight">

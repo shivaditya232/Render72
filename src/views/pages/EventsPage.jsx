@@ -236,6 +236,7 @@ const EventsPage=()=>{
                                                                         now={now}
                                                                         isFeatured={event.isFeatured}
                                                                         isWide={isWide}
+                                                                        stamp={section.hideHeading?'date':'time'}
                                                                     />
                                                                 </li>
                                                             );

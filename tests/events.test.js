@@ -322,3 +322,12 @@ describe('day sections and track colours',()=>{
         expect(normalizeEvent({id:'x'},NOW).track.color).toBe('#B9B4AA');
     });
 });
+
+describe('poster time stamp',()=>{
+    it('splits IST start time into clock and AM/PM',async ()=>{
+        const {getTimeParts}=await import('../src/utils/formatters');
+        expect(getTimeParts(Date.parse('2026-11-13T09:30:00+05:30'))).toEqual({clock:'9:30',meridiem:'AM'});
+        expect(getTimeParts(Date.parse('2026-11-13T18:00:00+05:30'))).toEqual({clock:'6:00',meridiem:'PM'});
+        expect(getTimeParts(null)).toBe(null);
+    });
+});

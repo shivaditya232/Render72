@@ -223,3 +223,16 @@ export const getLongDateParts=(ms)=>{
     }
     return {weekday:longWeekdayFormatter.format(ms),month:longMonthFormatter.format(ms)};
 };
+
+// { clock:'9:30', meridiem:'AM' } in IST, for the big time stamp on posters.
+export const getTimeParts=(ms)=>{
+    const text=formatTime(ms);
+    if(!text){
+        return null;
+    }
+    const match=text.match(/^(\d{1,2}:\d{2})\s?(AM|PM)$/i);
+    if(!match){
+        return {clock:text,meridiem:''};
+    }
+    return {clock:match[1],meridiem:match[2].toUpperCase()};
+};
