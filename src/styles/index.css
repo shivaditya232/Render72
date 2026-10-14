@@ -620,3 +620,39 @@ dialog.r72-dialog[open].full{
         transition:none;
     }
 }
+
+/* ---------- Event page: section panel ---------- */
+
+dialog.r72-dialog[open].panel{
+    position:fixed;
+    inset:0 0 0 auto;
+    height:100dvh;
+    width:min(620px,100vw);
+    animation:drawer-in 0.36s var(--ease-out-quint);
+}
+
+dialog.r72-dialog[open].sheet > div{
+    max-height:88dvh;
+}
+
+/* ---------- Poster grows into the event page (View Transitions) ---------- */
+/* The poster you click on the wall and the poster on the event page share one name,
+   so the browser morphs one into the other. Everything else simply cross-fades. */
+
+::view-transition-group(event-poster){
+    animation-duration:0.55s;
+    animation-timing-function:cubic-bezier(0.22,1,0.36,1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root){
+    animation-duration:0.28s;
+}
+
+@media (prefers-reduced-motion:reduce){
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*){
+        animation:none !important;
+    }
+}

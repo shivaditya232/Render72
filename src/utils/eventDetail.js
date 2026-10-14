@@ -240,3 +240,85 @@ export const getTimeSummary=(event)=>{
     }
     return sessions.length+' sessions, see the schedule';
 };
+
+const shorten=(text,limit)=>{
+    if(typeof text!=='string'){
+        return '';
+    }
+    if(text.length<=limit){
+        return text;
+    }
+    const cut=text.slice(0,limit);
+    const lastSpace=cut.lastIndexOf(' ');
+    return (lastSpace>limit*0.6?cut.slice(0,lastSpace):cut)+'…';
+};
+
+// What each tile on the event page says before it's opened: a big value and a short note.
+// { id, label, value, unit, note }
+export const getSectionTeasers=(event)=>{
+    const sections=getDetailSections(event);
+    const result=[];
+    for(let i=0;i<sections.length;i++){
+        const section=sections[i];
+        const teaser={id:section.id,label:section.label,value:'',unit:'',note:''};
+        if(section.id==='about'){
+            const points=event.highlights.length+event.whatToExpect.length;
+            teaser.value='Read';
+            teaser.unit='the full story';
+            teaser.note=points>0?points+(points===1?' highlight':' highlights')+' inside':'';
+        }
+        else if(section.id==='schedule'){
+            const sessions=getDisplaySessions(event);
+            if(sessions.length>1){
+                teaser.value=String(sessions.length);
+                teaser.unit='sessions';
+            }
+            else{
+                const session=sessions[0];
+                const end=session.end!==null?session.end:session.start;
+                const hours=Math.round((end-session.start)/(60*60*1000));
+                teaser.value=hours>0?hours+'h':'1';
+                teaser.unit=hours>0?(session.isOvernight?'non-stop':'on the day'):'session';
+            }
+            teaser.note=getTimeSummary(event);
+        }
+        else if(section.id==='prizes'){
+            if(event.prizePool>0){
+                teaser.value='₹'+event.prizePool.toLocaleString('en-IN');
+                teaser.unit='in prizes';
+            }
+            else{
+                teaser.value=String(event.prizes.length);
+                teaser.unit=event.prizes.length===1?'award':'awards';
+            }
+            teaser.note=event.prizes.length+(event.prizes.length===1?' prize':' prizes')+' to win';
+        }
+        else if(section.id==='entry'){
+            teaser.value=String(event.eligibility.length+event.prerequisites.length);
+            teaser.unit='things to check';
+            teaser.note=shorten(event.eligibility[0]||event.prerequisites[0],70);
+        }
+        else if(section.id==='rules'){
+            teaser.value=String(event.rules.length);
+            teaser.unit=event.rules.length===1?'rule':'rules';
+            teaser.note=shorten(event.rules[0],70);
+        }
+        else if(section.id==='gallery'){
+            teaser.value=String(event.gallery.length);
+            teaser.unit=event.gallery.length===1?'photo':'photos';
+        }
+        else if(section.id==='faq'){
+            teaser.value=String(event.faqs.length);
+            teaser.unit=event.faqs.length===1?'question answered':'questions answered';
+            teaser.note=shorten(event.faqs[0].question,70);
+        }
+        else if(section.id==='people'){
+            const count=event.organizers.length+event.coordinators.length;
+            teaser.value=String(count);
+            teaser.unit=count===1?'person to ask':'people to ask';
+            teaser.note=event.organizers.length>0?event.organizers[0].name:'';
+        }
+        result.push(teaser);
+    }
+    return result;
+};

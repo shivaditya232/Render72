@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import DetailSection from './DetailSection';
+import {useContext,useState} from 'react';
+import DetailSection,{InPanelContext} from './DetailSection';
 import {buildSrcSet,getSizedImageUrl} from '../../utils/images';
 import {getGalleryFacts} from '../../utils/eventDetail';
 
@@ -47,6 +47,7 @@ const FactTile=({fact,className,color,isAccent})=>{
 // Bento grid: a big photo, a wide photo, and the event's numbers set as tiles.
 // Works with one or two photos, and with one or two fact tiles.
 const GallerySection=({event})=>{
+    const inPanel=useContext(InPanelContext);
     const photos=event.gallery.slice(0,2);
     const facts=getGalleryFacts(event);
     const altBase='Photo from '+event.name;
@@ -57,6 +58,19 @@ const GallerySection=({event})=>{
     }
     return (
         <DetailSection id="gallery" eyebrow={event.isPast?'From the day':'From past editions'} title="Gallery">
+            {inPanel?(
+                // In the side panel: photos one under the other, full width.
+                <div className="space-y-3">
+                    {photos.map((photo,index)=>{
+                        return <BentoPhoto key={photo} url={photo} alt={altBase+', '+(index+1)+' of '+photos.length} className="aspect-[4/3]" sizes="(min-width:768px) 560px, 92vw"/>;
+                    })}
+                    <div className="grid grid-cols-2 gap-3">
+                        {facts.map((fact,index)=>{
+                            return <FactTile key={index} fact={fact} className={facts.length===1?'col-span-2 aspect-[2/1]':'aspect-square'} color={event.track.color} isAccent={index===0}/>;
+                        })}
+                    </div>
+                </div>
+            ):(
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:grid-rows-[15rem_15rem]">
                 <BentoPhoto url={photos[0]} alt={altBase+', 1 of '+photos.length} className="col-span-2 aspect-[4/3] lg:row-span-2 lg:aspect-auto" sizes="(min-width:1024px) 34vw, 92vw"/>
                 {hasSecond?(
@@ -73,6 +87,7 @@ const GallerySection=({event})=>{
                     return <FactTile key={index} fact={fact} className={className} color={event.track.color} isAccent={index===0}/>;
                 })}
             </div>
+            )}
         </DetailSection>
     );
 };

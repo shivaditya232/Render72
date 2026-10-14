@@ -1,6 +1,7 @@
 import {useRef,useState} from 'react';
 import {buildSrcSet,getSizedImageUrl} from '../../utils/images';
 import {getDateParts,formatPosterNumber,isMultiDay} from '../../utils/formatters';
+import {POSTER_TRANSITION_NAME} from '../../utils/posterTransition';
 
 // Each screen size gets a photo cropped to the shape it's shown in.
 // Phones 4:3, tablets 16:9 across the page, desktops a 4:5 poster beside the title.
@@ -62,7 +63,7 @@ const EventHero=({event,posterNumber})=>{
     };
 
     return (
-        <div className="poster-card relative aspect-[4/3] overflow-hidden rounded-2xl sm:aspect-[16/9] lg:aspect-[4/5]" onPointerMove={onPointerMove}>
+        <div className="poster-card vt-poster relative aspect-[4/3] overflow-hidden rounded-2xl sm:aspect-[16/9] lg:aspect-[4/5]" style={{viewTransitionName:POSTER_TRANSITION_NAME}} onPointerMove={onPointerMove}>
             {hasPhoto?(
                 <div ref={frameRef} className="duotone h-full w-full" style={{'--tint':event.track.color,'--reveal-size':'200px'}}>
                     <HeroPhoto

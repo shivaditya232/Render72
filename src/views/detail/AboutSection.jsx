@@ -23,12 +23,12 @@ const PointList=({title,items,color})=>{
 };
 
 // The story of the event, then the highlights and what the day looks like.
-const AboutSection=({event,isLoadingMore})=>{
+const AboutSection=({event,isLoadingMore,hideBlurb})=>{
     const paragraphs=splitParagraphs(event.description);
     return (
         <DetailSection id="about" eyebrow="The event" title="About">
             <div className="space-y-5">
-                {event.blurb?<p className="max-w-[65ch] text-xl leading-snug text-bone">{event.blurb}</p>:null}
+                {event.blurb&&!hideBlurb?<p className="max-w-[65ch] text-xl leading-snug text-bone">{event.blurb}</p>:null}
                 {paragraphs.map((paragraph,index)=>{
                     return <p key={index} className="max-w-[65ch] text-[1.0625rem] leading-relaxed text-bone/80">{paragraph}</p>;
                 })}
@@ -41,7 +41,7 @@ const AboutSection=({event,isLoadingMore})=>{
                 ):null}
             </div>
             {event.highlights.length>0||event.whatToExpect.length>0?(
-                <div className="mt-10 grid gap-10 md:grid-cols-2">
+                <div className="mt-10 grid gap-10 sm:grid-cols-2">
                     <PointList title="Highlights" items={event.highlights} color={event.track.color}/>
                     <PointList title="What to expect" items={event.whatToExpect} color={event.track.color}/>
                 </div>

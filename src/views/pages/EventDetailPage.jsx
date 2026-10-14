@@ -9,7 +9,8 @@ import EventHero from '../detail/EventHero';
 import BookingCard from '../detail/BookingCard';
 import MobileBookingBar from '../detail/MobileBookingBar';
 import RegisterDialog from '../detail/RegisterDialog';
-import SectionNav from '../detail/SectionNav';
+import SectionTiles from '../detail/SectionTiles';
+import SectionPanel from '../detail/SectionPanel';
 import AboutSection from '../detail/AboutSection';
 import ScheduleSection from '../detail/ScheduleSection';
 import PrizeSection from '../detail/PrizeSection';
@@ -23,10 +24,9 @@ import DetailSkeleton from '../detail/DetailSkeleton';
 import useEventDetail from '../../controllers/useEventDetail';
 import useEventExtras from '../../controllers/useEventExtras';
 import useDocumentTitle from '../../controllers/useDocumentTitle';
-import useScrollSpy from '../../controllers/useScrollSpy';
 import useShare from '../../controllers/useShare';
 import {getAvailability} from '../../utils/availability';
-import {getDetailSections,getVenueText,getTimeSummary} from '../../utils/eventDetail';
+import {getDetailSections,getSectionTeasers,getVenueText,getTimeSummary} from '../../utils/eventDetail';
 import {formatDateRange,formatTeamSize} from '../../utils/formatters';
 import SwellText from '../components/SwellText';
 import RollText from '../components/RollText';
@@ -59,11 +59,35 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
         return getDetailSections(event);
     },[event]);
 
-    const sectionIds=[];
-    for(let i=0;i<sections.length;i++){
-        sectionIds.push(sections[i].id);
-    }
-    const activeId=useScrollSpy(sectionIds);
+    const teasers=useMemo(()=>{
+        return getSectionTeasers(event);
+    },[event]);
+
+    // Which section's panel is open (null = none).
+    const [panelIndex,setPanelIndex]=useState(null);
+
+    const openPanel=useCallback((index)=>{
+        setPanelIndex(index);
+    },[]);
+
+    const closePanel=useCallback(()=>{
+        setPanelIndex(null);
+    },[]);
+
+    const renderSection=(id)=>{
+        if(id==='about'){
+            return <AboutSection event={event} hideBlurb={true}/>;
+        }
+        const View=SECTION_VIEWS[id];
+        if(!View){
+            return null;
+        }
+        return (
+            <SectionBoundary label="This section">
+                <View event={event}/>
+            </SectionBoundary>
+        );
+    };
 
     const openRegister=useCallback(()=>{
         setRegisterOpen(true);
@@ -154,24 +178,13 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
                         </div>
                     </aside>
 
-                    <div className="min-w-0 lg:col-start-1 lg:row-start-2">
-                        <SectionNav sections={sections} activeId={activeId}/>
-                        <div className="space-y-16 pt-6">
-                            <SectionBoundary label="About">
-                                <AboutSection event={event} isLoadingMore={partial&&isRefreshing}/>
-                            </SectionBoundary>
-                            {sections.map((section)=>{
-                                const View=SECTION_VIEWS[section.id];
-                                if(!View){
-                                    return null;
-                                }
-                                return (
-                                    <SectionBoundary key={section.id} label={section.label}>
-                                        <View event={event}/>
-                                    </SectionBoundary>
-                                );
-                            })}
-                        </div>
+                    <div className="min-w-0 space-y-10 lg:col-start-1 lg:row-start-2">
+                        {event.blurb?(
+                            <p className="max-w-[60ch] text-xl leading-snug text-bone sm:text-2xl">{event.blurb}</p>
+                        ):null}
+                        <SectionBoundary label="The event details">
+                            <SectionTiles teasers={teasers} event={event} onOpen={openPanel} isLoadingMore={partial&&isRefreshing}/>
+                        </SectionBoundary>
                     </div>
                 </div>
 
@@ -195,6 +208,14 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
                 onRegister={openRegister}
                 isSaved={extras.isSaved}
                 onToggleSave={extras.toggleSave}
+            />
+            <SectionPanel
+                open={panelIndex!==null}
+                onClose={closePanel}
+                sections={sections}
+                index={panelIndex===null?0:panelIndex}
+                onStep={openPanel}
+                renderSection={renderSection}
             />
             <RegisterDialog
                 open={registerOpen}

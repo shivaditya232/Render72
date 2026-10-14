@@ -5,6 +5,7 @@ import SaveButton from './SaveButton';
 import SeatsMeter from './SeatsMeter';
 import Highlight from './Highlight';
 import {getAvailability} from '../../utils/availability';
+import {markPosterForTransition} from '../../utils/posterTransition';
 import {getDateParts,getTimeParts,formatSpan,formatPrice,formatTeamSize,formatPosterNumber,isMultiDay} from '../../utils/formatters';
 
 const POSTER_SIZES='(min-width:1536px) 330px, (min-width:1024px) 31vw, (min-width:640px) 46vw, 92vw';
@@ -48,12 +49,19 @@ const PosterCard=({event,number,tokens,saved,onToggleSave,priority,now,isFeature
         });
     };
 
+    const posterRef=useRef(null);
+
+    // Clicking the poster lets it grow into the event page's poster.
+    const onOpen=()=>{
+        markPosterForTransition(posterRef.current);
+    };
+
     const frameClass=isWide?'relative aspect-[4/5] overflow-hidden rounded-2xl sm:aspect-[16/10]':'relative aspect-[4/5] overflow-hidden rounded-2xl';
     const titleClass=isWide?'condensed text-[clamp(1.75rem,3vw,2.375rem)] font-bold leading-[1] tracking-tight text-bone':'condensed text-[1.5rem] font-bold leading-[1.05] tracking-tight text-bone';
 
     return (
         <article className="poster-card group relative flex h-full flex-col" onPointerMove={onPointerMove}>
-            <div className={frameClass}>
+            <div ref={posterRef} className={frameClass}>
                 <PosterImage
                     url={event.cover.url}
                     alt={event.cover.alt}
@@ -106,7 +114,7 @@ const PosterCard=({event,number,tokens,saved,onToggleSave,priority,now,isFeature
                 </p>
                 <h3 className={titleClass}>
                     {/* The whole card is clickable through this link's ::after layer. */}
-                    <Link to={'/events/'+event.id} className="outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-signal-soft">
+                    <Link to={'/events/'+event.id} viewTransition onClick={onOpen} className="outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-signal-soft">
                         <Highlight text={event.name} tokens={tokens}/>
                     </Link>
                 </h3>
