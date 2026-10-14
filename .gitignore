@@ -1,0 +1,10 @@
+node_modules
+dist
+.DS_Store
+.vercel
+*.log
+.env
+.env.*
+
+# Generated on every build by scripts/fetchSnapshot.mjs
+public/fallback/events/
