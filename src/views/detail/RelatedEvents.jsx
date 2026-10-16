@@ -4,20 +4,7 @@ import Icon from '../components/Icon';
 import RollText from '../components/RollText';
 
 // "More like this": same track first, then whatever's coming up soonest.
-const RelatedEvents=({events,current,posterNumbers,isSaved,onToggleSave,now,isLoading})=>{
-    if(events.length===0&&isLoading){
-        // The rest of the programme is still on its way: hold the space with poster shapes.
-        return (
-            <section aria-label="More events, loading" aria-busy="true" className="border-t border-line pt-12">
-                <div className="skeleton h-10 w-64 rounded-xl"/>
-                <div aria-hidden="true" className="mt-8 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                    <div className="skeleton aspect-[4/5] rounded-2xl"/>
-                    <div className="skeleton hidden aspect-[4/5] rounded-2xl sm:block"/>
-                    <div className="skeleton hidden aspect-[4/5] rounded-2xl lg:block"/>
-                </div>
-            </section>
-        );
-    }
+const RelatedEvents=({events,current,posterNumbers,isSaved,onToggleSave,now})=>{
     if(events.length===0){
         return null;
     }

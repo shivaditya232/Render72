@@ -1,7 +1,6 @@
 import {Link} from 'react-router';
 import Icon from '../components/Icon';
 import SwellText from '../components/SwellText';
-import LoadingPhrase from '../components/LoadingPhrase';
 import Countdown from './Countdown';
 import TrackDock from './TrackDock';
 import {TRACKS} from '../../config/tracks';
@@ -70,16 +69,10 @@ const HeroSection=({festWindow,status,trackSummaries,hasClosingSoon,notice})=>{
                     the dock's place, right under the headline instead of below the fold. */}
                 {status!=='ready'&&status!=='loading'?notice:null}
                 {status==='loading'?(
-                    <div className="relative">
-                        <div aria-hidden="true" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:h-[clamp(20rem,44vh,28rem)]">
-                            {TRACKS.map((track)=>{
-                                return <div key={track.id} className="skeleton aspect-[6/5] rounded-2xl lg:aspect-auto lg:flex-1"/>;
-                            })}
-                        </div>
-                        {/* Laid over the bands, so it takes no space and nothing jumps when they fill in. */}
-                        <div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center px-4 text-center">
-                            <LoadingPhrase active={true}/>
-                        </div>
+                    <div aria-hidden="true" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:h-[clamp(20rem,44vh,28rem)]">
+                        {TRACKS.map((track)=>{
+                            return <div key={track.id} className="skeleton aspect-[6/5] rounded-2xl lg:aspect-auto lg:flex-1"/>;
+                        })}
                     </div>
                 ):null}
             </div>

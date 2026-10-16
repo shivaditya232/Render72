@@ -28,10 +28,3 @@ export const FALLBACK_DETAIL_URL='/fallback/events/';
 // All times shown on the site are in Indian Standard Time.
 export const TIME_ZONE='Asia/Kolkata';
 export const IST_OFFSET='+05:30';
-
-// When nothing has loaded yet: after this long the page says it's taking a while…
-export const SLOW_NOTICE_MS=4000;
-
-// …and after this long it shows the last saved copy (or the copy bundled with the site)
-// while the retries carry on. When the live data arrives, it quietly replaces the copy.
-export const SHOW_BACKUP_AFTER_MS=8000;

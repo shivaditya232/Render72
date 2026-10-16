@@ -492,21 +492,6 @@ export const getCachedEvents=()=>{
     }
 };
 
-// The best copy we have without waiting for the network: the last saved list (any age),
-// or the copy bundled with the site. Used when the server is slow to answer, so a first
-// visit isn't stuck on a skeleton while the retries run. Returns null if there is none.
-export const getBackupEvents=async ()=>{
-    const cached=getCachedEvents();
-    if(cached&&cached.events.length>0){
-        return {events:cached.events,source:'cache',savedAt:cached.savedAt};
-    }
-    const fallback=await loadFallbackList();
-    if(fallback){
-        return {events:fallback.events,source:'fallback',savedAt:fallback.generatedAt};
-    }
-    return null;
-};
-
 // Returns { events, source:'network'|'cache'|'fallback', savedAt, error }
 // Only throws if there is truly nothing to show.
 export const getAllEvents=async (options)=>{
@@ -593,31 +578,6 @@ const findInFallbackList=async (id)=>{
         if(fallback.events[i].id===id){
             return fallback.events[i];
         }
-    }
-    return null;
-};
-
-// The best saved copy of one event without the network: a cached full version, the copy
-// bundled with the site, or the short version from a list. Returns null if there is none.
-// { event, source, savedAt, partial }
-export const getBackupEvent=async (id)=>{
-    if(!isValidEventId(id)){
-        return null;
-    }
-    const cached=getCachedEventDetail(id);
-    if(cached){
-        return {event:cached.event,source:'cache',savedAt:cached.savedAt,partial:false};
-    }
-    const fallbackDetail=await loadFallbackDetail(id);
-    if(fallbackDetail){
-        return {event:fallbackDetail,source:'fallback',savedAt:null,partial:false};
-    }
-    let summary=getEventSummaryById(id);
-    if(!summary){
-        summary=await findInFallbackList(id);
-    }
-    if(summary){
-        return {event:summary,source:'summary',savedAt:null,partial:true};
     }
     return null;
 };

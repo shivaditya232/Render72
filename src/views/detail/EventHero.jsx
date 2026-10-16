@@ -1,9 +1,7 @@
-import {useRef} from 'react';
+import {useRef,useState} from 'react';
 import {buildSrcSet,getSizedImageUrl} from '../../utils/images';
 import {getDateParts,formatPosterNumber,isMultiDay} from '../../utils/formatters';
 import {POSTER_TRANSITION_NAME} from '../../utils/posterTransition';
-import useImageLoad from '../../controllers/useImageLoad';
-import PhotoUnavailable from '../components/PhotoUnavailable';
 
 // Each screen size gets a photo cropped to the shape it's shown in.
 // Phones 4:3, tablets 16:9 across the page, desktops a 4:5 poster beside the title.
@@ -11,13 +9,12 @@ const PHONE={widths:[480,720,960],ratio:0.75};
 const TABLET={widths:[768,1024,1280],ratio:0.5625,media:'(min-width: 640px)'};
 const DESKTOP={widths:[400,600,800],ratio:1.25,media:'(min-width: 1024px)'};
 
-const HeroPhoto=({url,alt,className,isDecorative,onLoad,onError,imgRef})=>{
+const HeroPhoto=({url,alt,className,isDecorative,onError})=>{
     return (
         <picture>
             <source media={DESKTOP.media} srcSet={buildSrcSet(url,DESKTOP.widths,DESKTOP.ratio)} sizes="380px"/>
             <source media={TABLET.media} srcSet={buildSrcSet(url,TABLET.widths,TABLET.ratio)} sizes="94vw"/>
             <img
-                ref={imgRef}
                 className={className}
                 src={getSizedImageUrl(url,PHONE.widths[1],Math.round(PHONE.widths[1]*PHONE.ratio))}
                 srcSet={buildSrcSet(url,PHONE.widths,PHONE.ratio)}
@@ -29,7 +26,6 @@ const HeroPhoto=({url,alt,className,isDecorative,onLoad,onError,imgRef})=>{
                 loading="eager"
                 fetchPriority={isDecorative?'auto':'high'}
                 decoding="async"
-                onLoad={onLoad}
                 onError={onError}
             />
         </picture>
@@ -39,15 +35,13 @@ const HeroPhoto=({url,alt,className,isDecorative,onLoad,onError,imgRef})=>{
 // The event's photo printed in its track colour, the date set large in the corner
 // like the posters: a wide banner on phones and tablets, a tall poster on desktop. The real colours come through under the mouse.
 const EventHero=({event,posterNumber})=>{
-    const photo=useImageLoad(event.banner.url);
+    const [failed,setFailed]=useState(false);
     const frameRef=useRef(null);
     const pending=useRef(false);
     const date=getDateParts(event.start);
     const spansDays=isMultiDay(event.start,event.end);
     const url=event.banner.url;
-    const hasUrl=Boolean(getSizedImageUrl(url,PHONE.widths[0],null));
-    const hasPhoto=hasUrl&&photo.status!=='failed';
-    const isLoading=photo.status!=='loaded';
+    const hasPhoto=Boolean(getSizedImageUrl(url,PHONE.widths[0],null))&&!failed;
 
     const onPointerMove=(pointerEvent)=>{
         if(pointerEvent.pointerType!=='mouse'||pending.current){
@@ -73,23 +67,24 @@ const EventHero=({event,posterNumber})=>{
             {hasPhoto?(
                 <div ref={frameRef} className="duotone h-full w-full" style={{'--tint':event.track.color,'--reveal-size':'200px'}}>
                     <HeroPhoto
-                        key={'hero-'+photo.attempt}
                         url={url}
                         alt={event.banner.alt}
                         className="duo-base"
-                        imgRef={photo.imgRef}
-                        onLoad={photo.onLoad}
-                        onError={photo.onError}
+                        onError={()=>{
+                            setFailed(true);
+                        }}
                     />
                     <div className="duo-tint" aria-hidden="true"/>
                     <div className="duo-lift" aria-hidden="true"/>
-                    {isLoading?null:<HeroPhoto url={url} className="duo-reveal" isDecorative={true}/>}
+                    <HeroPhoto url={url} className="duo-reveal" isDecorative={true}/>
                     <div className="duo-shade" aria-hidden="true"/>
-                    {isLoading?<div className="skeleton absolute inset-0" aria-hidden="true"/>:null}
                 </div>
             ):(
-                <div className="duotone h-full w-full" style={{'--tint':event.track.color}} role={hasUrl?'img':undefined} aria-label={hasUrl?event.banner.alt+' (photo unavailable)':undefined}>
-                    <PhotoUnavailable tint={event.track.color}/>
+                <div className="duotone flex h-full w-full items-start justify-end p-6" style={{'--tint':event.track.color}} aria-hidden="true">
+                    <div className="duo-lift"/>
+                    <span className="condensed relative text-right text-[clamp(3rem,9vw,8rem)] lg:text-[4rem] font-extrabold uppercase leading-[0.82]" style={{color:event.track.color}}>
+                        {event.track.label}
+                    </span>
                 </div>
             )}
 

@@ -11,21 +11,7 @@ const DataSourceNotice=({source,savedAt,error,onRetry,isRefreshing})=>{
         return null;
     }
     let text='';
-    if(error.kind==='slow'){
-        // The server is slow, not down: we're showing a saved copy while it keeps trying.
-        let copy='the last saved copy';
-        if(source==='fallback'){
-            copy='the copy saved with the site';
-        }
-        else if(source==='summary'){
-            copy='the short version';
-        }
-        else if(savedAt){
-            copy='the copy from '+formatRelative(savedAt);
-        }
-        text='Taking too long, so this is '+copy+'. Still trying the live programme…';
-    }
-    else if(source==='fallback'){
+    if(source==='fallback'){
         text='The live programme couldn’t load, so this is the copy saved with the site';
         if(savedAt){
             text=text+' on '+formatShortDate(savedAt);

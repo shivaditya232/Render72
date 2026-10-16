@@ -26,10 +26,6 @@ const ERROR_COPY={
         title:'That request didn’t work.',
         body:'Try again, or head back to the full programme.'
     },
-    slow:{
-        title:'The programme server is taking too long.',
-        body:'We’re still trying. Try again in a moment.'
-    },
     not_found:{
         title:'This one isn’t on the programme.',
         body:'It may have been removed, or the link has a typo.'
