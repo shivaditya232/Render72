@@ -1,4 +1,5 @@
 import {useCallback,useMemo,useState} from 'react';
+import {useLocation} from 'react-router';
 import ErrorState from '../components/ErrorState';
 import DataSourceNotice from '../components/DataSourceNotice';
 import LoadingPhrase from '../components/LoadingPhrase';
@@ -28,8 +29,12 @@ import {getQueryTokens} from '../../utils/filterEvents';
 import {splitIntoDays} from '../../utils/schedule';
 import {getPosterNumbers} from '../../utils/landing';
 import SwellText from '../components/SwellText';
+import useBatchedList from '../../controllers/useBatchedList';
+
+const BATCH_SIZE=12;
 
 const EventsPage=()=>{
+    const location=useLocation();
     useDocumentTitle('All events','Every event on the programme. Search, filter by track, day, fee and team size, and save the ones you want to a plan that flags clashes.');
     const {status,events,source,savedAt,error,retry,isRefreshing}=useEvents();
     const filters=useEventFilters(events);
@@ -78,13 +83,29 @@ const EventsPage=()=>{
     // Tracks live in the bar on the page; everything else is in the "More filters" panel.
     const moreFilterCount=filters.activeFacetCount-filters.state.facets.track.length;
 
+    // Long lists arrive in batches of 12 as you scroll (see useBatchedList).
+    // A new search or filter starts again from the first batch.
+    const batch=useBatchedList(results,BATCH_SIZE,location.search,location.pathname+location.search);
+    const visibleResults=batch.visible;
+
+    // How many events each day has in total, so a day heading (and whether a day's only
+    // event gets a wide poster) doesn't change as more of the list loads in.
+    const dayTotals=useMemo(()=>{
+        const totals={};
+        const allDays=splitIntoDays(results);
+        for(let i=0;i<allDays.length;i++){
+            totals[allDays[i].key]=allDays[i].events.length;
+        }
+        return totals;
+    },[results]);
+
     // Day headings only make sense when the list is in date order.
     const sections=useMemo(()=>{
         if(filters.state.sort==='soonest'){
-            return splitIntoDays(results);
+            return splitIntoDays(visibleResults);
         }
-        return [{key:'all',start:null,events:results,hideHeading:true}];
-    },[results,filters.state.sort]);
+        return [{key:'all',start:null,events:visibleResults,hideHeading:true}];
+    },[visibleResults,filters.state.sort]);
 
     const hasFilters=filters.activeFilters.length>0;
     const tabTotal=filters.whenCounts[filters.state.when];
@@ -191,7 +212,7 @@ const EventsPage=()=>{
                             <SectionBoundary label="The event list">
                                 {view==='index'?(
                                     <ul className="border-t border-line">
-                                        {results.map((event)=>{
+                                        {visibleResults.map((event)=>{
                                             return (
                                                 <li key={event.id} ref={registerFlip(event.id)}>
                                                     <IndexRow
@@ -215,12 +236,13 @@ const EventsPage=()=>{
                                             return (
                                                 <section key={section.key} aria-labelledby={section.hideHeading?undefined:headingId} className="space-y-8">
                                                     {section.hideHeading?null:(
-                                                        <DayHeading start={section.start} count={section.events.length} headingId={headingId}/>
+                                                        <DayHeading start={section.start} count={dayTotals[section.key]||section.events.length} headingId={headingId}/>
                                                     )}
                                                     <ul className="grid grid-flow-dense grid-cols-1 gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                                                         {section.events.map((event,index)=>{
                                                             // Featured events, and a day's only event, get a wide two-column poster.
-                                                            const isWide=event.isFeatured||section.events.length===1;
+                                                            const dayTotal=section.hideHeading?section.events.length:(dayTotals[section.key]||section.events.length);
+                                                            const isWide=event.isFeatured||dayTotal===1;
                                                             return (
                                                                 <li key={event.id} ref={registerFlip(event.id)} className={isWide?'sm:col-span-2':undefined}>
                                                                     <PosterCard
@@ -246,6 +268,24 @@ const EventsPage=()=>{
                                         })}
                                     </div>
                                 )}
+                                {batch.hasMore?(
+                                    <div ref={batch.sentinelRef} className="mt-12 flex flex-col items-center gap-3">
+                                        <div aria-hidden="true" className="grid w-full grid-cols-1 gap-x-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+                                            <div className="skeleton h-24 rounded-2xl"/>
+                                            <div className="skeleton hidden h-24 rounded-2xl sm:block"/>
+                                            <div className="skeleton hidden h-24 rounded-2xl lg:block"/>
+                                            <div className="skeleton hidden h-24 rounded-2xl 2xl:block"/>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={batch.showMore}
+                                            className="fx-fill inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-sm font-medium text-bone"
+                                        >
+                                            Show more
+                                            <span className="tabular text-ash">{batch.remaining} left</span>
+                                        </button>
+                                    </div>
+                                ):null}
                             </SectionBoundary>
                         ):null}
                     </div>

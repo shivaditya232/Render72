@@ -1,5 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {getAllEvents,getCachedEvents} from '../models/eventModel';
+import {getAllEvents,getCachedEvents,getBackupEvents} from '../models/eventModel';
+import {createRequestError} from '../models/httpClient';
+import {SHOW_BACKUP_AFTER_MS} from '../config/apiConfig';
 
 // Controller for the events list.
 // Shows cached data instantly (no spinner on repeat visits), refreshes it in the
@@ -76,6 +78,41 @@ const useEvents=()=>{
             });
         }
     },[]);
+
+    // Nothing on screen and the server is slow: after a few seconds show the saved copy
+    // instead of an endless skeleton. The request keeps going; live data replaces the copy.
+    useEffect(()=>{
+        if(state.status!=='loading'){
+            return undefined;
+        }
+        const thisRequest=requestNumber.current;
+        let cancelled=false;
+        const timer=setTimeout(async ()=>{
+            const backup=await getBackupEvents();
+            if(cancelled||!backup||!isMounted.current||thisRequest!==requestNumber.current){
+                return;
+            }
+            setState((previous)=>{
+                // The live answer (or a final error) got here first: leave it.
+                if(previous.status!=='loading'){
+                    return previous;
+                }
+                return {
+                    status:'ready',
+                    events:backup.events,
+                    source:backup.source,
+                    savedAt:backup.savedAt,
+                    error:createRequestError('slow','The server is taking too long'),
+                    attempt:previous.attempt,
+                    isRefreshing:true
+                };
+            });
+        },SHOW_BACKUP_AFTER_MS);
+        return ()=>{
+            cancelled=true;
+            clearTimeout(timer);
+        };
+    },[state.status]);
 
     // First load: if the cache is fresh we're done; otherwise ask the network.
     useEffect(()=>{

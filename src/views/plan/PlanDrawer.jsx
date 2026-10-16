@@ -113,6 +113,19 @@ const PlanContent=({onClose})=>{
                         </div>
                     ):null}
 
+                    {/* Saved events we can't draw yet: still loading, or the programme couldn't load. */}
+                    {plan.count>planned.found.length+planned.missing.length&&status==='loading'?(
+                        <div aria-busy="true" aria-label="Loading your saved events" className="space-y-2 pb-6">
+                            <div className="skeleton h-20 rounded-xl"/>
+                            <div className="skeleton h-20 rounded-xl"/>
+                        </div>
+                    ):null}
+                    {plan.count>planned.found.length+planned.missing.length&&status==='error'?(
+                        <p role="status" className="mb-5 rounded-xl border border-line px-4 py-3 text-sm text-ash">
+                            Some saved events can’t be shown right now because the programme didn’t load. They’re still saved and will appear when it does.
+                        </p>
+                    ):null}
+
                     {clashCount>0?(
                         <p role="status" className="mb-5 rounded-xl border border-few/30 bg-few/[0.06] px-4 py-3 text-sm text-bone">
                             {clashCount} of your events overlap. You can still keep them, just pick which one you’ll be at.

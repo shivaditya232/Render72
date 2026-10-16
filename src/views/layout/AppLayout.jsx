@@ -4,6 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import NetworkBanner from './NetworkBanner';
 import NavigationOverlay from './NavigationOverlay';
+import Toaster from './Toaster';
 import useNetworkStatus from '../../controllers/useNetworkStatus';
 import {preloadPages,importWithRetry} from '../../routes/lazyPage';
 import {PAGE_IMPORTERS,importPlanDrawer} from '../../routes/pageImporters';
@@ -56,6 +57,7 @@ const AppLayout=()=>{
             </main>
             <Footer/>
             <NavigationOverlay isPending={isPending} isOnline={isOnline}/>
+            <Toaster/>
             {planWanted?(
                 <Suspense fallback={null}>
                     <PlanDrawer open={planOpen} onClose={closePlan}/>

@@ -1,33 +1,40 @@
-import {useContext,useState} from 'react';
+import {useContext} from 'react';
 import DetailSection,{InPanelContext} from './DetailSection';
 import {buildSrcSet,getSizedImageUrl} from '../../utils/images';
 import {getGalleryFacts} from '../../utils/eventDetail';
+import useImageLoad from '../../controllers/useImageLoad';
+import PhotoUnavailable from '../components/PhotoUnavailable';
 
 const PHOTO_WIDTHS=[480,800,1200];
 
 // One gallery photo in full colour (the posters are two-tone; this is the real thing).
-// A broken photo hides itself instead of showing a broken icon.
-const BentoPhoto=({url,alt,className,sizes})=>{
-    const [failed,setFailed]=useState(false);
-    if(failed){
-        return null;
-    }
+// A shimmer holds its place while it loads; if it can't load, a calm panel stays instead
+// of leaving a hole in the grid, and it retries when the connection is back.
+const BentoPhoto=({url,alt,className,sizes,tint})=>{
+    const photo=useImageLoad(url);
+    const isLoading=photo.status==='loading';
     return (
         <div className={'bento-photo relative overflow-hidden rounded-2xl bg-graphite '+className}>
-            <img
-                src={getSizedImageUrl(url,PHOTO_WIDTHS[1],null)}
-                srcSet={buildSrcSet(url,PHOTO_WIDTHS,null)}
-                sizes={sizes}
-                alt={alt}
-                width={PHOTO_WIDTHS[1]}
-                height={Math.round(PHOTO_WIDTHS[1]*0.66)}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover"
-                onError={()=>{
-                    setFailed(true);
-                }}
-            />
+            {photo.status==='failed'?(
+                <PhotoUnavailable tint={tint}/>
+            ):(
+                <img
+                    key={'photo-'+photo.attempt}
+                    ref={photo.imgRef}
+                    src={getSizedImageUrl(url,PHOTO_WIDTHS[1],null)}
+                    srcSet={buildSrcSet(url,PHOTO_WIDTHS,null)}
+                    sizes={sizes}
+                    alt={alt}
+                    width={PHOTO_WIDTHS[1]}
+                    height={Math.round(PHOTO_WIDTHS[1]*0.66)}
+                    loading="lazy"
+                    decoding="async"
+                    className={'absolute inset-0 h-full w-full object-cover transition-opacity duration-300 '+(isLoading?'opacity-0':'opacity-100')}
+                    onLoad={photo.onLoad}
+                    onError={photo.onError}
+                />
+            )}
+            {isLoading?<div className="skeleton absolute inset-0" aria-hidden="true"/>:null}
         </div>
     );
 };
@@ -62,7 +69,7 @@ const GallerySection=({event})=>{
                 // In the side panel: photos one under the other, full width.
                 <div className="space-y-3">
                     {photos.map((photo,index)=>{
-                        return <BentoPhoto key={photo} url={photo} alt={altBase+', '+(index+1)+' of '+photos.length} className="aspect-[4/3]" sizes="(min-width:768px) 560px, 92vw"/>;
+                        return <BentoPhoto key={photo} tint={event.track.color} url={photo} alt={altBase+', '+(index+1)+' of '+photos.length} className="aspect-[4/3]" sizes="(min-width:768px) 560px, 92vw"/>;
                     })}
                     <div className="grid grid-cols-2 gap-3">
                         {facts.map((fact,index)=>{
@@ -72,9 +79,9 @@ const GallerySection=({event})=>{
                 </div>
             ):(
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:grid-rows-[15rem_15rem]">
-                <BentoPhoto url={photos[0]} alt={altBase+', 1 of '+photos.length} className="col-span-2 aspect-[4/3] lg:row-span-2 lg:aspect-auto" sizes="(min-width:1024px) 34vw, 92vw"/>
+                <BentoPhoto tint={event.track.color} url={photos[0]} alt={altBase+', 1 of '+photos.length} className="col-span-2 aspect-[4/3] lg:row-span-2 lg:aspect-auto" sizes="(min-width:1024px) 34vw, 92vw"/>
                 {hasSecond?(
-                    <BentoPhoto url={photos[1]} alt={altBase+', 2 of '+photos.length} className="col-span-2 aspect-[16/9] lg:aspect-auto" sizes="(min-width:1024px) 34vw, 92vw"/>
+                    <BentoPhoto tint={event.track.color} url={photos[1]} alt={altBase+', 2 of '+photos.length} className="col-span-2 aspect-[16/9] lg:aspect-auto" sizes="(min-width:1024px) 34vw, 92vw"/>
                 ):null}
                 {facts.map((fact,index)=>{
                     let className=factClass;

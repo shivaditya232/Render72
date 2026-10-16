@@ -656,3 +656,8 @@ dialog.r72-dialog[open].sheet > div{
         animation:none !important;
     }
 }
+
+@keyframes toast-in{
+    from{transform:translateY(12px);opacity:0;}
+    to{transform:none;opacity:1;}
+}

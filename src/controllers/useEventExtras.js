@@ -11,7 +11,7 @@ const RELATED_COUNT=3;
 // its poster number, related events, and clashes with the visitor's saved plan.
 // If the list can't load, these simply stay empty; the event itself still shows.
 const useEventExtras=(event)=>{
-    const {events}=useEvents();
+    const {events,status}=useEvents();
     const plan=usePlan();
 
     const posterNumbers=useMemo(()=>{
@@ -54,6 +54,7 @@ const useEventExtras=(event)=>{
     }
 
     return {
+        listStatus:status,
         posterNumber,
         related,
         posterNumbers,

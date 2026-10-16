@@ -196,6 +196,7 @@ const EventView=({event,partial,source,savedAt,error,retry,isRefreshing})=>{
                         isSaved={extras.isPlanSaved}
                         onToggleSave={extras.togglePlan}
                         now={now}
+                        isLoading={extras.listStatus==='loading'}
                     />
                 </SectionBoundary>
             </article>

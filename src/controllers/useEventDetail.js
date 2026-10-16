@@ -1,5 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {getEventById} from '../models/eventModel';
+import {getEventById,getBackupEvent} from '../models/eventModel';
+import {createRequestError} from '../models/httpClient';
+import {SHOW_BACKUP_AFTER_MS} from '../config/apiConfig';
 
 // Controller for one event page.
 // "initial" comes from the route loader: the cached full event, or the short summary
@@ -100,6 +102,40 @@ const useEventDetail=(id,initial)=>{
         // initial only matters when the id changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[id,load]);
+
+    // Nothing on screen and the server is slow: after a few seconds show the saved copy
+    // of this event while the request keeps going (the live version replaces it).
+    useEffect(()=>{
+        if(state.status!=='loading'){
+            return undefined;
+        }
+        let cancelled=false;
+        const timer=setTimeout(async ()=>{
+            const backup=await getBackupEvent(id);
+            if(cancelled||!backup){
+                return;
+            }
+            setState((previous)=>{
+                if(previous.status!=='loading'){
+                    return previous;
+                }
+                return {
+                    status:'ready',
+                    event:backup.event,
+                    partial:backup.partial,
+                    source:backup.source,
+                    savedAt:backup.savedAt,
+                    error:createRequestError('slow','The server is taking too long'),
+                    attempt:previous.attempt,
+                    isRefreshing:true
+                };
+            });
+        },SHOW_BACKUP_AFTER_MS);
+        return ()=>{
+            cancelled=true;
+            clearTimeout(timer);
+        };
+    },[state.status,id]);
 
     useEffect(()=>{
         const onOnline=()=>{
